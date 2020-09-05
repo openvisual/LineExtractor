@@ -208,7 +208,7 @@ if __name__ == '__main__':
     from glob import glob
 
     files = []
-    folder = "../data_yegan/"
+    folder = "./data_yegan/"
     for ext in ('*.gif', '*.png', '*.jpg'):
         files.extend(glob(join( folder, ext)))
     pass
