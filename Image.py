@@ -37,8 +37,6 @@ class Image (Common) :
         # 2차원 이미지 배열 데이터
         self.img = img
         self.algorithm = algorithm
-        self.histogram = None
-        self.histogram_acc = None
         self.fileName = None
     pass
 
@@ -193,7 +191,7 @@ class Image (Common) :
 
         ax = plt.subplot(Image.gridSpec.new_subplotspec((Image.gs_row, gs_col), colspan=colspan))
 
-        histogram = self.make_histogram()
+        histogram = self.histogram()
         histogram_acc = self.accumulate_histogram( histogram )
 
         max_y = 0
@@ -212,10 +210,6 @@ class Image (Common) :
         hist_med = np.median(histogram)
 
         log.info( f"hist avg = {hist_avg}, std = {hist_std}, med={hist_med}" )
-
-        gs_avg = self.average()
-        gs_max = self.max()
-        gs_std = self.std()
 
         charts = {}
 
@@ -581,15 +575,19 @@ class Image (Common) :
     pass  # -- remove_noise
 
     @profile
-    def make_histogram(self):
+    def histogram(self):
         # TODO     Histogram 생성
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         img = self.img
 
+        img = img.astype(np.uint8)
+
         size = 256 if np.max( img ) > 1 else 2
 
         histogram = cv2.calcHist([img], [0], None, [size], [0, size])
+
+        histogram = histogram.flatten()
 
         return histogram
     pass  # -- make_histogram
@@ -631,18 +629,7 @@ class Image (Common) :
 
         img = self.img
 
-        h = len( img )
-        w = len( img[0] )
-
-        histogram = None
-
-        if not hasattr(self, "histogram" ) or self.histogram is None :
-            histogram , _ = self.make_histogram()
-        else :
-            histogram = self.histogram
-        pass
-
-        histogram = histogram.copy()
+        histogram = self.histogram()
 
         useMargin = False
         margin = 0
@@ -653,7 +640,7 @@ class Image (Common) :
 
         x = np.arange(0, len(histogram))
 
-        avg =  margin + ( sum( histogram * x )/np.sum( histogram ) )
+        avg = margin + ( sum( histogram * x )/np.sum( histogram ) )
 
         threshold = avg
 
@@ -674,7 +661,7 @@ class Image (Common) :
 
         img = self.img
 
-        histogram, _ = self.make_histogram()
+        histogram = self.histogram()
 
         threshold = 0
         t_diff = None
@@ -710,7 +697,7 @@ class Image (Common) :
 
         img = self.img
 
-        histogram, _ = self.make_histogram()
+        histogram = self.histogram()
 
         threshold = 0
         t_diff = None

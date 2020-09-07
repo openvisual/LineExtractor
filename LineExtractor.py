@@ -20,6 +20,7 @@ class LineExtractor ( Common ):
     pass
 
     def my_line_extract(self, img_path, qtUi = None, mode="A", lineListA=None) :
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         # TODO    원천 이미지 획득
         # 이미지를 파일로 부터 RGB 색상으로 읽어들인다.
@@ -256,18 +257,20 @@ if __name__ == '__main__':
         lineListAll.save_as_json(json_file_name=json_file_name)
     pass
 
+    lineExtractor.print_profile()
+
     if 1 :
         # 결과창 폴더 열기
         folder = "c:/temp"
         lineExtractor.open_file_or_folder(folder)
 
         #plt.show()
-    else :
+    pass
+
+    if 1 :
         log.info("Plot show.....")
         plt.show()
     pass
-
-    lineExtractor.print_profile()
 
     log.info("Good bye!")
 
