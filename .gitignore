@@ -132,3 +132,6 @@ dmypy.json
 .idea/LineExtractor.iml
 .idea/misc.xml
 /.idea
+/.idea/*.*
+
+/.idea/inspectionProfiles
