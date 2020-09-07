@@ -41,9 +41,11 @@ class Threshold(Common) :
 
     pass  # -- threshold
 
-    # TODO     전역 임계치 처리
+    @profile
     def threshold_global(self ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        # TODO     전역 임계치 처리
 
         reverse_required = 0
 
@@ -76,6 +78,7 @@ class Threshold(Common) :
         return image
     pass  # -- 전역 임계치 처리
 
+    @profile
     def threshold_isodata(self ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -113,6 +116,7 @@ class Threshold(Common) :
         return image
     pass  # -- threshold_isodata
 
+    @profile
     def threshold_balanced( self ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -149,6 +153,7 @@ class Threshold(Common) :
         return image
     pass  # -- threshold_balanced
 
+    @profile
     def threshold_li(self ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -171,7 +176,7 @@ class Threshold(Common) :
 
         data = img > opt_threshold
 
-        algorithm = f"threshold_li( {opt_threshold} )"
+        algorithm = f"threshold_li( {opt_threshold:0.0f} )"
 
         image = Image(data)
         image.algorithm = algorithm
@@ -180,9 +185,11 @@ class Threshold(Common) :
 
     pass  # -- threshold_li
 
-    # TODO     지역 평균 적응 임계치 처리
+    @profile
     def threshold_adaptive_mean(self, bsize=3, c=0):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        # TODO     지역 평균 적응 임계치 처리
 
         reverse_required = 1
 
@@ -228,6 +235,7 @@ class Threshold(Common) :
         return image
     pass  # -- 지역 평균 적응 임계치 처리
 
+    @profile
     def threshold_otsu(self):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -253,8 +261,10 @@ class Threshold(Common) :
         return image
     pass  # -- threshold_otsu_opencv
 
-    # TODO     지역 가우시안 적응 임계치 처리
+    @profile
     def threshold_adaptive_gaussian(self, bsize=5, c=0):
+        # TODO     지역 가우시안 적응 임계치 처리
+
         algorithm = 0
 
         if algorithm == 0 :
@@ -266,6 +276,7 @@ class Threshold(Common) :
         return v
     pass # -- threshold_adaptive_gaussian
 
+    @profile
     def threshold_adaptive_gaussian_opencv(self, bsize=5, c=0):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -289,6 +300,7 @@ class Threshold(Common) :
         return image
     pass  # -- threshold_adaptive_gaussian_opencv
 
+    @profile
     def threshold_adaptive_gaussian_my(self, bsize=3, c=0):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 

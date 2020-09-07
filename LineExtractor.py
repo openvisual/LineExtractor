@@ -86,7 +86,7 @@ class LineExtractor ( Common ):
         curr_image = image_org
 
         if 1 : # -- grayscale 변환
-            grayscale = image_org.convert_to_grayscale()
+            grayscale = curr_image.convert_to_grayscale()
             grayscale.reverse_image( max=255 )
             grayscale.save_img_as_file( img_path, "grayscale" )
             grayscale.plot_image(title="Grayscale", border_color = "green", qtUi=qtUi, mode=mode)
@@ -127,6 +127,38 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- gradient
 
+        if 1:  # TODO 이진화
+            # algorithm = "threshold_otsu"
+            # algorithm = "threshold_isodata"
+            # algorithm = "threshold_balanced"
+            # algorithm = "threshold_adaptive_gaussian"
+            # algorithm = "threshold_adaptive_mean"
+            # algorithm = "threshold_global"
+            algorithm = "threshold_li"
+
+            bin_image = curr_image.threshold(algorithm=algorithm)
+
+            curr_image = bin_image
+
+            if curr_image.reverse_required:
+                curr_image = curr_image.reverse_image()
+            pass
+
+            curr_image.save_img_as_file(img_path, f"image_binarized({curr_image.algorithm})")
+            title = f"Binarization ({curr_image.algorithm})"
+            curr_image.plot_image(title=title, border_color="blue", qtUi=qtUi, mode=mode)
+        pass  # -- 이진화
+
+        use_morphology = True
+        if use_morphology: # TODO morphology
+            morphology = curr_image.morphology(is_open=1, bsize=7, iterations=10, kernel_type="cross")
+
+            curr_image = morphology
+
+            curr_image.save_img_as_file(img_path, curr_image.algorithm)
+            curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
+        pass  # -- morphology
+
         useContour = True
         if useContour: # TODO Contour
             contour = curr_image.contours()
@@ -137,36 +169,6 @@ class LineExtractor ( Common ):
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass
-
-        if 1 : #TODO 이진화
-            #algorithm = "threshold_otsu"
-            #algorithm = "threshold_isodata"
-            #algorithm = "threshold_balanced"
-            #algorithm = "threshold_adaptive_gaussian"
-            #algorithm = "threshold_adaptive_mean"
-            algorithm = "threshold_global"
-
-            bin_image = curr_image.threshold(algorithm=algorithm)
-            if bin_image.reverse_required :
-                bin_image = bin_image.reverse_image()
-            pass
-
-            curr_image = bin_image
-
-            curr_image.save_img_as_file( img_path, f"image_binarized({curr_image.algorithm})" )
-            title = f"Binarization ({curr_image.algorithm})"
-            curr_image.plot_image(title=title, border_color="blue", qtUi=qtUi, mode=mode)
-        pass #-- 이진화
-
-        use_morphology = False
-        if use_morphology : # TODO morphology
-            morphology = curr_image.morphology( is_open=0, bsize=7, iterations=3, kernel_type="cross" )
-
-            curr_image = morphology
-
-            curr_image.save_img_as_file( img_path, curr_image.algorithm )
-            curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
-        pass # -- morphology
 
         lineList = None
 

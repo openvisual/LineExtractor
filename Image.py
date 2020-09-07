@@ -38,6 +38,7 @@ class Image (Common) :
         self.img = img
         self.algorithm = algorithm
         self.fileName = None
+        self.reverse_required = False
     pass
 
     def img_file_name(self, img_path, work):
@@ -380,6 +381,7 @@ class Image (Common) :
         return self.width()/self.height()
     pass
 
+    @profile
     def reverse_image( self, max=None):
         # TODO   영상 역전 함수
 
@@ -404,6 +406,7 @@ class Image (Common) :
         return self
     pass # -- reverse_image
 
+    @profile
     def laplacian(self, ksize=5):
         # TODO   라플라시안
         # https://docs.opencv.org/master/d5/d0f/tutorial_py_gradients.html
@@ -443,6 +446,7 @@ class Image (Common) :
         return Image( img=data, algorithm=algorithm)
     pass  # -- laplacian
 
+    @profile
     def gradient(self, ksize=5, kernel_type="cross"):
         # TODO   그라디언트
         # https://docs.opencv.org/trunk/d9/d61/tutorial_py_morphological_ops.html
@@ -475,6 +479,7 @@ class Image (Common) :
         return Image( img=data, algorithm=algorithm)
     pass  # -- gradient
 
+    @profile
     def contours(self, lineWidth=1):
         # TODO  등고선
         #  https://docs.opencv.org/trunk/d4/d73/tutorial_py_contours_begin.html
@@ -494,8 +499,14 @@ class Image (Common) :
 
         algorithm = f"contours(mode={mode}, method={method})"
 
-        # Find Canny edges
-        edged = cv2.Canny( img, 30, 255)
+        max_img = np.max( img )
+
+        edged = img
+
+        if max_img > 1 :
+            # Find Canny edges
+            edged = cv2.Canny( img, 30, 255)
+        pass
 
         ( contours, c ) = cv2.findContours(edged, mode, method)
 
@@ -548,6 +559,7 @@ class Image (Common) :
         return Image( img=data, algorithm=algorithm)
     pass  # -- contours
 
+    @profile
     def remove_noise(self, algorithm , ksize=5 ):
         # TODO   잡음 제거
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
@@ -621,16 +633,16 @@ class Image (Common) :
         return image
     pass # -- normalize_image_by_histogram
 
+    @profile
     def threshold(self, algorithm):
-
         import Threshold
 
         threshold = Threshold.Threshold( image = self )
 
         return threshold.threshold( algorithm = algorithm )
-    pass
+    pass # -- threshold
 
-
+    @profile
     def morphology(self, is_open, bsize = 5, iterations = 1, kernel_type = "cross" ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -677,6 +689,7 @@ class Image (Common) :
         return image
     pass  # -- morphology_closing
 
+    @profile
     def extract_lines(self, merge_lines=1, img_path=""):
         # hough line 추출
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
@@ -709,6 +722,10 @@ class Image (Common) :
 
         lines_org = cv.HoughLinesP(img, 1, np.pi/180, threshold, lines=None, minLineLength=minLineLength, maxLineGap=maxLineGap )
 
+        if lines_org is None :
+            lines_org = []
+        pass
+
         lines = []
         for line in lines_org :
             lines.append( Line( line = line[0], fileBase=fileBase ) )
@@ -735,6 +752,7 @@ class Image (Common) :
         return lineList
     pass # extract_lines
 
+    @profile
     def plot_lines(self, lineList ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
