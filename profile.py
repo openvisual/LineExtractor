@@ -94,11 +94,11 @@ def print_profile():
 
     profs = PROF_DATA.values()
 
-    def compare_by_prof_fn_name( a, b ) :
-        return len(a.fn_name) - len( b.fn_name )
+    def compare_by_prof_avg_time( a, b ) :
+        return a.avg_time() - b.avg_time()
     pass
 
-    profs = sorted(profs, key=cmp_to_key( compare_by_prof_fn_name ))
+    profs = sorted(profs, key=cmp_to_key( compare_by_prof_avg_time ))
 
     profs.reverse()
 

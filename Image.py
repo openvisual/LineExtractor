@@ -193,12 +193,8 @@ class Image (Common) :
 
         ax = plt.subplot(Image.gridSpec.new_subplotspec((Image.gs_row, gs_col), colspan=colspan))
 
-        if not hasattr(self, "histogram") or self.histogram is None :
-            self.make_histogram()
-        pass
-
-        histogram = self.histogram
-        histogram_acc = self.histogram_acc
+        histogram = self.make_histogram()
+        histogram_acc = self.accumulate_histogram( histogram )
 
         max_y = 0
 
@@ -213,7 +209,6 @@ class Image (Common) :
 
         hist_avg = np.average(histogram)
         hist_std = np.std(histogram)
-        hist_max = np.max(histogram)
         hist_med = np.median(histogram)
 
         log.info( f"hist avg = {hist_avg}, std = {hist_std}, med={hist_med}" )
@@ -592,45 +587,19 @@ class Image (Common) :
 
         img = self.img
 
-        min = np.min( img )
-        max = np.max( img )
-
-        log.info( f"hist img min={min}, max={max}")
-
         size = 256 if np.max( img ) > 1 else 2
 
-        histogram = [0] * size
+        histogram = cv2.calcHist([img], [0], None, [size], [0, size])
 
-        for row in img:
-            for gs in row:
-                gs = int( gs )
-                histogram[gs] += 1
-            pass
-        pass
-
-        histogram = np.array( histogram )
-
-        log.info( f"Done. {msg}" )
-
-        histogram_acc = self.accumulate_histogram( histogram )
-
-        self.histogram = histogram
-
-        return histogram, histogram_acc
+        return histogram
     pass  # -- make_histogram
 
     @profile
     def accumulate_histogram(self, histogram):
         # TODO    누적 히스토 그램
-
-        msg = "Accumulate histogram ..."
-        log.info(msg)
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         histogram_acc = np.add.accumulate(histogram)
-
-        self.histogram_acc = histogram_acc
-
-        log.info( f"Done. {msg}" )
 
         return histogram_acc
     pass  # accumulate_histogram
