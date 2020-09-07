@@ -390,7 +390,7 @@ class Image (Common) :
     def reverse_image( self, max=None):
         # TODO   영상 역전 함수
 
-        log.info("Reverse image....")
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         img = self.img
 
@@ -412,74 +412,74 @@ class Image (Common) :
     pass # -- reverse_image
 
     @profile
-    def laplacian(self, ksize=5):
+    def laplacian(self, bsize=7):
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
         # TODO   라플라시안
         # https://docs.opencv.org/master/d5/d0f/tutorial_py_gradients.html
 
-        msg = "Laplacian"
-        log.info( f"{msg} ..." )
-
-        ksize = 2*int(ksize/2) + 1
+        bsize = 2 * int(bsize / 2) + 1
 
         img = self.img
 
-        algorithm = f"laplacian ksize={ksize}"
+        algorithm = f"laplacian bsize={bsize}"
 
         img = img.astype(np.float)
 
         data = cv.Laplacian(img, cv.CV_64F)
 
-        # normalize to gray scale
-        min = np.min( data )
-        max = np.max( data )
+        cv.normalize(data, data.copy(), 0, 255, cv.NORM_MINMAX)
 
-        data = (255/(max - min))*(data - min)
+        use_scale = False
 
-        min = np.min(data)
-        max = np.max(data)
-        # -- # normalize to gray scale
+        if use_scale :
+            # normalize to gray scale
+            min = np.min( data )
+            max = np.max( data )
 
-        data = data.astype(np.int)
+            data = (255/(max - min))*(data - min)
 
-        min = np.min(data)
-        max = np.max(data)
+            min = np.min(data)
+            max = np.max(data)
+            # -- # normalize to gray scale
 
-        log.info( f"min = {min}, max={max}")
+            data = data.astype(np.int)
 
-        log.info( f"Done. {msg}" )
+            min = np.min(data)
+            max = np.max(data)
 
-        return Image( img=data, algorithm=algorithm)
+            log.info( f"min = {min}, max={max}")
+        pass
+
+        return Image(img=data, algorithm=algorithm)
     pass  # -- laplacian
 
     @profile
-    def gradient(self, ksize=5, kernel_type="cross"):
+    def gradient(self, bsize=5, kernel_type="cross"):
         # TODO   그라디언트
         # https://docs.opencv.org/trunk/d9/d61/tutorial_py_morphological_ops.html
 
-        msg = "Gradient"
-        log.info( f"{msg} ..." )
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
-        ksize = 2*int(ksize/2) + 1
+        bsize = 2*int(bsize/2) + 1
 
         img = self.img
 
-        algorithm = f"Gradient ksize={ksize}, ktype={kernel_type}"
+        algorithm = f"Gradient bsize={bsize}, ktype={kernel_type}"
 
         img = img.astype(np.uint8)
 
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (bsize, bsize))
 
         if kernel_type == "rect":
-            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (bsize, bsize))
         elif kernel_type == "cross":
-            kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (ksize, ksize))
+            kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (bsize, bsize))
         elif kernel_type == "ellipse":
-            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (ksize, ksize))
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (bsize, bsize))
         pass
 
         data = cv.morphologyEx(img, cv.MORPH_GRADIENT, kernel)
-
-        log.info( f"Done. {msg}" )
 
         return Image( img=data, algorithm=algorithm)
     pass  # -- gradient
@@ -490,6 +490,8 @@ class Image (Common) :
         #  https://docs.opencv.org/trunk/d4/d73/tutorial_py_contours_begin.html
 
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        debug = False
 
         img = self.img
 
@@ -508,17 +510,25 @@ class Image (Common) :
 
         edged = img
 
-        if max_img > 1 :
+        useCanny = True
+        if useCanny and max_img > 1 :
             # Find Canny edges
-            edged = cv2.Canny( img, 30, 255)
+            edged = cv2.Canny(img, 5, 255 )
         pass
 
-        ( contours, c ) = cv2.findContours(edged, mode, method)
+        contours = []
+
+        if cv.__version__ in [ "4.4.0" ] :
+            ( contours_cv, _ ) = cv2.findContours(edged, mode, method)
+            contours = contours_cv
+        else :
+            ( _, contours_cv, _) = cv2.findContours(edged, mode, method)
+            contours = contours_cv
+        pass
 
         data = np.zeros((h, w, 3), dtype="uint8")
 
         useFilter = True
-
         if useFilter :
             filters = []
             diagonal = math.sqrt( w*w + h*h )
@@ -537,12 +547,12 @@ class Image (Common) :
 
                     valid = ( rect_width > ref_width or rect_height > ref_height )
 
-                    log.info(f"[{i:03d}] rect valid={valid}, width = {rect_width}, height = {rect_height}")
+                    debug and log.info(f"[{i:03d}] rect valid={valid}, width = {rect_width}, height = {rect_height}")
                 pass
 
                 if valid :
                     arc_len = cv2.arcLength( cnt , 0 )
-                    log.info( f"[{i:03d} contour = {arc_len}" )
+                    debug and log.info( f"[{i:03d} contour = {arc_len}" )
                     valid = ( arc_len > ref_len )
                 pass
 
@@ -620,7 +630,7 @@ class Image (Common) :
     pass  # accumulate_histogram
 
     @profile
-    def normalize_image_by_histogram(self):
+    def normalize(self):
         # TODO    히스토그램 평활화
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 

@@ -108,7 +108,7 @@ class LineExtractor ( Common ):
         pass
 
         if 1 : # TODO 평활화
-            normalized = curr_image.normalize_image_by_histogram()
+            normalized = curr_image.normalize()
 
             curr_image = normalized
 
@@ -117,9 +117,21 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass
 
-        useGradient = True
+        useLaplacian = False
+
+        if useLaplacian : # TODO Laplacian
+            laplacian = curr_image.laplacian(bsize=7)
+
+            curr_image = laplacian
+
+            curr_image.save_img_as_file(img_path, curr_image.algorithm)
+            curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
+            curr_image.plot_histogram(qtUi=qtUi, mode=mode)
+        pass  # -- gradient
+
+        useGradient = not useLaplacian
         if useGradient : # TODO Gradient
-            gradient = curr_image.gradient(ksize=7, kernel_type="cross")
+            gradient = curr_image.gradient(bsize=7, kernel_type="cross")
 
             curr_image = gradient
 
@@ -128,7 +140,8 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- gradient
 
-        if 1:  # TODO 이진화
+        useThread = False
+        if useThread :  # TODO 이진화
             # algorithm = "threshold_otsu"
             # algorithm = "threshold_isodata"
             # algorithm = "threshold_balanced"
@@ -150,9 +163,9 @@ class LineExtractor ( Common ):
             curr_image.plot_image(title=title, border_color="blue", qtUi=qtUi, mode=mode)
         pass  # -- 이진화
 
-        use_morphology = True
+        use_morphology = False
         if use_morphology: # TODO morphology
-            morphology = curr_image.morphology(is_open=1, bsize=7, iterations=10, kernel_type="cross")
+            morphology = curr_image.morphology(is_open=1, bsize=3, iterations=1, kernel_type="cross")
 
             curr_image = morphology
 
@@ -220,7 +233,7 @@ if __name__ == '__main__':
 
     if 1 :
         img_path = "./data_yegan/set_01/_1018843.JPG"
-        img_path = "./data_yegan/set_01/_1018885.JPG"
+        #img_path = "./data_yegan/set_01/_1018885.JPG"
     pass
 
     if img_path :
