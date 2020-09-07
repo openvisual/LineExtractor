@@ -5,6 +5,8 @@ log.basicConfig( format='%(asctime)s, %(levelname)-8s [%(filename)s:%(lineno)04d
 
 import os, glob
 
+from profile import *
+
 class Common :
 
     def __init__(self):

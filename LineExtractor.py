@@ -208,26 +208,25 @@ if __name__ == '__main__':
     from glob import glob
 
     files = []
-    folder = "./data_yegan/"
-    for ext in ('*.gif', '*.png', '*.jpg'):
-        files.extend(glob(join( folder, ext)))
+
+    img_path = ""
+
+    img_path = "./data_yegan/set_01/_1018843.JPG"
+
+    if img_path :
+        files.append( img_path )
+    else :
+        folder = "./data_yegan/set_01"
+        for ext in ('*.gif', '*.png', '*.jpg'):
+            files.extend(glob(join( folder, ext)))
+        pass
     pass
 
     log.info( f"file count={ len(files )}" )
 
     lineListAll = LineList()
 
-    img_path = "../data_yegan/_1018843.JPG"
-
-    iteration = -1
-
     for i in range( 0 , len(files), 2 ) :
-        if iteration < 0 :
-            pass
-        elif i > iteration :
-            break
-        pass
-
         file = files[i]
 
         img_path = file.replace( "\\", "/" )
