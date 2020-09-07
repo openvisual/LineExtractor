@@ -217,6 +217,8 @@ if __name__ == '__main__':
 
     img_path = "./data_yegan/set_01/_1018843.JPG"
 
+    img_path = "./data_yegan/set_01/_1018885.JPG"
+
     if img_path :
         files.append( img_path )
     else :
@@ -267,7 +269,8 @@ if __name__ == '__main__':
         #plt.show()
     pass
 
-    if 1 :
+    usePlot = False
+    if usePlot :
         log.info("Plot show.....")
         plt.show()
     pass
