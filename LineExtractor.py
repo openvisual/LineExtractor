@@ -140,7 +140,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- gradient
 
-        useThread = False
+        useThread = True
         if useThread :  # TODO 이진화
             # algorithm = "threshold_otsu"
             # algorithm = "threshold_isodata"
@@ -163,8 +163,8 @@ class LineExtractor ( Common ):
             curr_image.plot_image(title=title, border_color="blue", qtUi=qtUi, mode=mode)
         pass  # -- 이진화
 
-        use_morphology = False
-        if use_morphology: # TODO morphology
+        use_morphology = True
+        if use_morphology:  # TODO morphology
             morphology = curr_image.morphology(is_open=1, bsize=3, iterations=1, kernel_type="cross")
 
             curr_image = morphology
@@ -173,7 +173,18 @@ class LineExtractor ( Common ):
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
         pass  # -- morphology
 
-        useContour = True
+        useCanny = True
+        if useCanny:
+            canny = curr_image.canny(max=255)
+
+            curr_image = canny
+
+            curr_image.save_img_as_file(img_path, curr_image.algorithm)
+            curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
+            curr_image.plot_histogram(qtUi=qtUi, mode=mode)
+        pass  # -- canny
+
+        useContour = False
         if useContour: # TODO Contour
             contour = curr_image.contours()
 

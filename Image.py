@@ -485,6 +485,31 @@ class Image (Common) :
     pass  # -- gradient
 
     @profile
+    def canny(self, min=5, max=255):
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        debug = False
+
+        img = self.img
+
+        img = img.astype(np.uint8)
+
+        max_img = np.max(img)
+
+        if max_img <= 1 :
+            min = 0
+            max = 1
+        pass
+
+        algorithm = f"canny(min={min}, max={max})"
+
+        data = cv2.Canny(img, min, max)
+
+        return Image(img=data, algorithm=algorithm)
+
+    pass  # -- canny
+
+    @profile
     def contours(self, lineWidth=1):
         # TODO  등고선
         #  https://docs.opencv.org/trunk/d4/d73/tutorial_py_contours_begin.html
