@@ -702,7 +702,7 @@ class Image (Common) :
 
     ''' 이진화 '''
     # TODO     전역 임계치 처리
-    def threshold_golobal(self ):
+    def threshold_global(self ):
         msg = "Threshold global"
         log.info( f"{msg}" )
 
@@ -1023,7 +1023,7 @@ class Image (Common) :
             bsize = 5
             v = self.threshold_adaptive_mean(bsize=bsize, c=0)
         elif "global" in algorithm :
-            v = self.threshold_golobal()
+            v = self.threshold_global()
         elif "isodata" in algorithm :
             v = self.threshold_isodata()
         elif "balanced" in algorithm:

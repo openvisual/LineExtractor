@@ -131,3 +131,4 @@ dmypy.json
 /back
 .idea/LineExtractor.iml
 .idea/misc.xml
+/.idea
