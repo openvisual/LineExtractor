@@ -13,6 +13,47 @@ class Common :
         pass
     pass
 
+    def print_profile( self ):
+        print_profile()
+    pass
+
+    def show_versions(self):
+
+        import sys
+
+        log.info( f"Python version : {sys.version}" )
+
+        try:
+            import cv2
+            log.info( f"OpenCV version : {cv2.__version__}" )
+        except Exception as e:
+            log.info( f"{e}" )
+            log.info("OpenCV is not installed on this machine.")
+        pass
+
+        showTensorFlow = 0
+        if showTensorFlow :
+            # TensorFlow and tf.keras
+            import tensorflow as tf
+            from tensorflow import keras
+
+            log.info( f"TensorFlow version : {tf.__version__}" )
+            log.info( f"Keras version : {keras.__version__}" )
+
+            # print gpu spec
+
+            from tensorflow.python.client import device_lib
+            log.info(device_lib.list_local_devices())
+
+            if tf.test.gpu_device_name():
+                log.info( f'Default GPU Device: {tf.test.gpu_device_name()}' )
+            else:
+                log.info("Please install GPU version of TF")
+            pass
+            # -- print gpu spec
+        pass
+    pass # -- show versions
+
     def open_file_or_folder(self, path) :
         ''' open file or folder by an explorer'''
         import webbrowser as web
@@ -81,11 +122,13 @@ class Common :
 
     def chdir_to_curr_file(self) :
         # 현재 파일의 폴더로 실행 폴더를 이동함.
-        log.info( f"Pwd 1: {os.getcwd()}" )
+        cwd = os.getcwd()
+
+        log.info( f"Pwd 1: {cwd}" )
 
         dir_name = os.path.dirname(__file__) # change working dir to current file
 
-        if dir_name :
+        if dir_name and cwd != dir_name :
             os.chdir( dir_name )
             log.info(f"Pwd 2: {os.getcwd()}")
         pass

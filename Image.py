@@ -90,6 +90,7 @@ class Image (Common) :
         return fn
     pass  # -- img_file_name
 
+    @profile
     def save_img_as_file(self, img_path, work, ):
         fileName = self.img_file_name( img_path, work)
         img = self.img
@@ -507,7 +508,7 @@ class Image (Common) :
         # Find Canny edges
         edged = cv2.Canny( img, 30, 255)
 
-        ( a ,contours, c ) = cv2.findContours(edged, mode, method)
+        ( contours, c ) = cv2.findContours(edged, mode, method)
 
         data = np.zeros((h, w, 3), dtype="uint8")
 
@@ -697,7 +698,6 @@ class Image (Common) :
         return image
     pass # -- normalize_image_by_histogram
 
-    ''' 이진화 '''
     # TODO     전역 임계치 처리
     def threshold_global(self ):
         msg = "Threshold global"

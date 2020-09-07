@@ -200,7 +200,10 @@ class LineExtractor ( Common ):
 pass # -- LineExtractor
 
 if __name__ == '__main__':
+
     lineExtractor = LineExtractor()
+
+    lineExtractor.show_versions()
 
     lineExtractor.chdir_to_curr_file()
 
@@ -263,6 +266,8 @@ if __name__ == '__main__':
         log.info("Plot show.....")
         plt.show()
     pass
+
+    lineExtractor.print_profile()
 
     log.info("Good bye!")
 
