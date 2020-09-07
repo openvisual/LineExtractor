@@ -465,7 +465,7 @@ class Image (Common) :
 
         img = self.img
 
-        algorithm = f"Gradient bsize={bsize}, ktype={kernel_type}"
+        algorithm = f"gradient(bsize={bsize}, ktype={kernel_type})"
 
         img = img.astype(np.uint8)
 

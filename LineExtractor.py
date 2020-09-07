@@ -158,8 +158,8 @@ class LineExtractor ( Common ):
                 curr_image = curr_image.reverse_image()
             pass
 
-            curr_image.save_img_as_file(img_path, f"image_binarized({curr_image.algorithm})")
-            title = f"Binarization ({curr_image.algorithm})"
+            curr_image.save_img_as_file(img_path, f"{curr_image.algorithm}")
+            title = f"{curr_image.algorithm}"
             curr_image.plot_image(title=title, border_color="blue", qtUi=qtUi, mode=mode)
         pass  # -- 이진화
 
