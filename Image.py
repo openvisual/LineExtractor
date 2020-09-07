@@ -372,6 +372,11 @@ class Image (Common) :
 
         return h
     pass
+    
+    def diagonal(self):
+        w, h = self.dimension()
+        return math.sqrt( w*w + h*h )
+    pass
 
     def dimension(self):
         return self.width(), self.height()
@@ -643,12 +648,21 @@ class Image (Common) :
     pass # -- threshold
 
     @profile
-    def morphology(self, is_open, bsize = 5, iterations = 1, kernel_type = "cross" ):
+    def morphology(self, is_open, bsize = None, iterations = 1, kernel_type = "cross" ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        if bsize is None or bsize < 1 :
+            bsize = int( self.diagonal()/500 )
+
+            if bsize < 3 :
+                bsize = 3
+            pass
+        pass
 
         bsize = 2*int( bsize/2 ) + 1
 
         img = self.img
+
         img = img.astype(np.uint8)
 
         data = img

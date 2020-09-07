@@ -19,6 +19,7 @@ class LineExtractor ( Common ):
         Common.__init__( self )
     pass
 
+    @profile
     def my_line_extract(self, img_path, qtUi = None, mode="A", lineListA=None) :
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -217,9 +218,10 @@ if __name__ == '__main__':
 
     img_path = ""
 
-    img_path = "./data_yegan/set_01/_1018843.JPG"
-
-    img_path = "./data_yegan/set_01/_1018885.JPG"
+    if 1 :
+        img_path = "./data_yegan/set_01/_1018843.JPG"
+        img_path = "./data_yegan/set_01/_1018885.JPG"
+    pass
 
     if img_path :
         files.append( img_path )
