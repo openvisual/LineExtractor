@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 /data_yegan
 /back
+.idea/LineExtractor.iml
+.idea/misc.xml
