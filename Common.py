@@ -3,7 +3,7 @@
 import logging as log
 log.basicConfig( format='%(asctime)s, %(levelname)-8s [%(filename)s:%(lineno)04d] %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=log.INFO )
 
-import os, glob
+import os, glob, inspect
 
 from profile import *
 
@@ -18,6 +18,7 @@ class Common :
     pass
 
     def show_versions(self):
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         import sys
 

@@ -14,7 +14,7 @@ log.basicConfig( format='%(asctime)s, %(levelname)-8s [%(filename)s:%(lineno)04d
 # print_prof_data()
 
 import time
-from functools import wraps
+from functools import wraps, cmp_to_key
 
 PROF_DATA = {}
 PROF_LAST = None
@@ -39,7 +39,7 @@ class Profile :
 
     def avg_time(self):
         exec_times = self.exec_times
-        avg_time = sum(exec_times[1]) / len(exec_times[1])
+        avg_time = sum(exec_times) / len(exec_times)
         return avg_time
     pass
 pass # -- Profile
@@ -70,10 +70,11 @@ pass # -- profile(fn)
 def print_profile_name(fn_name, max_len ):
     prof = PROF_DATA[ fn_name ]
 
-    print_profile_data(fn_name, prof, max_len)
-pass
+    print_profile_data( prof, max_len)
+pass # -- print_profile_name
 
-def print_profile_data(fn_name, prof : Profile, max_len) :
+def print_profile_data(prof : Profile, max_len) :
+    fn_name = prof.fn_name
     max_time = prof.max_time()
     avg_time = prof.avg_time()
     call_times = prof.call_times
@@ -82,7 +83,7 @@ def print_profile_data(fn_name, prof : Profile, max_len) :
     msg = f"*** The function[ { fn_name_show } ] Average: {avg_time:.3f} sec(s), Max: {max_time:.3f} sec(s), Call : {call_times} times. "
 
     log.info( msg )
-pass # -- print_prof_name()
+pass # -- print_profile_data()
 
 def print_profile_last( ) :
     PROF_LAST and print_profile_name( PROF_LAST )
@@ -91,10 +92,20 @@ pass
 def print_profile():
     max_len = max( len(fn_name) for fn_name in PROF_DATA )
 
-    for fn_name, data in PROF_DATA :
-        print_profile_data( fn_name, data, max_len )
+    profs = PROF_DATA.values()
+
+    def compare_by_prof_fn_name( a, b ) :
+        return len(a.fn_name) - len( b.fn_name )
     pass
-pass # -- print_prof_data()
+
+    profs = sorted(profs, key=cmp_to_key( compare_by_prof_fn_name ))
+
+    profs.reverse()
+
+    for prof in profs :
+        print_profile_data( prof, max_len )
+    pass
+pass # -- print_profile()
 
 def clear_prof_data():
     global PROF_DATA

@@ -561,8 +561,7 @@ class Image (Common) :
 
     def remove_noise(self, algorithm , ksize=5 ):
         # TODO   잡음 제거
-        msg = "Remove noise"
-        log.info( f"{msg} ..." )
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         img = self.img
 
@@ -583,16 +582,13 @@ class Image (Common) :
             data = cv2.medianBlur(img, ksize)
         pass
 
-        log.info( f"Done. {msg}" )
-
         return Image( img=data, algorithm=algorithm)
     pass  # -- remove_noise
 
     @profile
     def make_histogram(self):
         # TODO     Histogram 생성
-        msg = "Make histogram ..."
-        log.info(msg)
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         img = self.img
 
@@ -642,66 +638,25 @@ class Image (Common) :
     @profile
     def normalize_image_by_histogram(self):
         # TODO    히스토그램 평활화
-
-        msg = "Normalize histogram"
-        log.info( f"{msg} ..." )
-
-        # https://en.wikipedia.org/wiki/Histogram_equalization
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         img = self.img
-
         w, h = self.dimension()
+
+        algorithm = "normalize"
 
         data = np.empty([h, w], dtype=img.dtype)
 
-        # -histogram 생성
-        _, histogram_acc = self.make_histogram()
+        cv.normalize(img, data, 0, 255, cv.NORM_MINMAX)
 
-        MN = h * w
-        L = len(histogram_acc)
-
-        cdf = histogram_acc
-
-        # cdf_min = cdf[ 0 ]
-        cdf_min = cdf[0]
-        for c in cdf:
-            if cdf_min == 0:
-                cdf_min = c
-            else:
-                break
-            pass
-        pass
-
-        log.info( f"cdf_min = {cdf_min}" )
-
-        idx = 0
-
-        cdf = np.array(cdf, 'float')
-
-        cdf = (cdf - cdf_min)*(L-1)/(MN - cdf_min)
-
-        for y, row in enumerate(img):
-            for x, gs in enumerate(row):
-                gs = int( gs )
-
-                data[y][x] = int(cdf[gs])
-
-                0 and log.info( f"[{idx:05d}] gs = {gs}, v={data[y][x]:0.4f}" )
-                idx += 1
-            pass
-        pass
-
-        log.info( f"Done. {msg}" )
-
-        image = Image( data )
+        image = Image( data, algorithm=algorithm )
 
         return image
     pass # -- normalize_image_by_histogram
 
     # TODO     전역 임계치 처리
     def threshold_global(self ):
-        msg = "Threshold global"
-        log.info( f"{msg}" )
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         reverse_required = 0
 
@@ -744,8 +699,7 @@ class Image (Common) :
     pass  # -- 전역 임계치 처리
 
     def threshold_isodata(self ):
-        msg = "Threshold isodata"
-        log.info( f"{msg}")
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         reverse_required = 0
 
@@ -781,8 +735,7 @@ class Image (Common) :
     pass  # -- threshold_isodata
 
     def threshold_balanced( self ):
-        msg = "Threshold balanced"
-        log.info( f"{msg}")
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         reverse_required = 0
 
@@ -817,7 +770,7 @@ class Image (Common) :
 
     # TODO     지역 평균 적응 임계치 처리
     def threshold_adaptive_mean(self, bsize=3, c=0):
-        log.info("Apdative threshold mean")
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         reverse_required = 1
 
@@ -862,8 +815,8 @@ class Image (Common) :
     pass  # -- 지역 평균 적응 임계치 처리
 
     def threshold_otsu(self):
-        msg = "threshold otsu"
-        log.info(msg)
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
         # https: // docs.opencv.org / 3.4 / d7 / d4d / tutorial_py_thresholding.html
 
         reverse_required = 0
@@ -898,8 +851,8 @@ class Image (Common) :
     pass # -- threshold_adaptive_gaussian
 
     def threshold_adaptive_gaussian_opencv(self, bsize=5, c=0):
-        msg = "Apdative threshold gaussian opencv"
-        log.info(msg)
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html
 
         reverse_required = 0
@@ -919,7 +872,7 @@ class Image (Common) :
     pass  # -- threshold_adaptive_gaussian_opencv
 
     def threshold_adaptive_gaussian_my(self, bsize=3, c=0):
-        log.info("Apdative threshold gaussian my")
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         # https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html#getgaussiankernel
 
@@ -1031,8 +984,7 @@ class Image (Common) :
     pass # -- binarize_image
 
     def morphology(self, is_open, bsize = 5, iterations = 1, kernel_type = "cross" ):
-        msg = "morphology"
-        log.info(msg)
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         bsize = 2*int( bsize/2 ) + 1
 
