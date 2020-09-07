@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 
 # Let's load a simple image with 3 black squares
@@ -9,8 +10,7 @@ grayscale = cv2.imread( img_path, 0 )
 
 img = grayscale
 
-def threadhold_li( img ) :
-    import numpy as np
+def threshold_li( img ) :
     from skimage import filters
 
     def quantile_95(image):
@@ -36,7 +36,7 @@ ax.imshow(img, cmap='gray')
 ax.set_title('image')
 ax.set_axis_off()
 
-bin = threadhold_li( img )
+bin = threshold_li( img )
 ax = axes[1]
 ax.imshow( bin, cmap='gray')
 ax.set_title('thresholded')
