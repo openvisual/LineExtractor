@@ -23,6 +23,8 @@ class LineExtractor ( Common ):
     def my_line_extract(self, img_path, qtUi = None, mode="A", lineListA=None) :
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
+        Image.img_save_cnt = 0
+
         # TODO    원천 이미지 획득
         # 이미지를 파일로 부터 RGB 색상으로 읽어들인다.
 
@@ -129,7 +131,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- gradient
 
-        useGradient = not useLaplacian
+        useGradient = False
         if useGradient : # TODO Gradient
             gradient = curr_image.gradient(bsize=7, kernel_type="cross")
 
@@ -142,13 +144,13 @@ class LineExtractor ( Common ):
 
         useThread = True
         if useThread :  # TODO 이진화
-            # algorithm = "threshold_otsu"
-            # algorithm = "threshold_isodata"
-            # algorithm = "threshold_balanced"
-            # algorithm = "threshold_adaptive_gaussian"
-            # algorithm = "threshold_adaptive_mean"
-            # algorithm = "threshold_global"
-            algorithm = "threshold_li"
+            #algorithm = "threshold_otsu"
+            #algorithm = "threshold_isodata"
+            #algorithm = "threshold_yen"
+            #algorithm = "threshold_balanced"
+            algorithm = "threshold_adaptive_gaussian"
+            #algorithm = "threshold_adaptive_mean"
+            #algorithm = "threshold_global"
 
             bin_image = curr_image.threshold(algorithm=algorithm)
 
@@ -173,9 +175,9 @@ class LineExtractor ( Common ):
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
         pass  # -- morphology
 
-        useCanny = True
+        useCanny = False
         if useCanny:
-            canny = curr_image.canny(max=255)
+            canny = curr_image.canny(min=1, max=255)
 
             curr_image = canny
 
@@ -184,7 +186,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- canny
 
-        useContour = True
+        useContour = False
         if useContour: # TODO Contour
             contour = curr_image.contours()
 

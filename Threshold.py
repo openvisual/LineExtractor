@@ -2,6 +2,7 @@
 
 from Common import *
 from Image import Image
+import cv2, cv2 as cv
 
 class Threshold(Common) :
 
@@ -9,26 +10,22 @@ class Threshold(Common) :
         self.image = image
     pass
 
-    def threshold(self, algorithm):
+    def threshold(self, algorithm, bsize=5, c=0):
         # TODO 이진화
 
         v = None
 
         if "_li" in algorithm :
             v = self.threshold_li()
+        elif "yen" in algorithm:
+            v = self.threshold_yen()
         elif "otsu" in algorithm:
             v = self.threshold_otsu()
         elif "gaussian" in algorithm:
-            w, h = self.image.dimension()
-
-            bsize = w if w > h else h
-            bsize = bsize / 6
-            bsize = 13
-
-            v = self.threshold_adaptive_gaussian(bsize=bsize, c=0)
+            v = self.threshold_adaptive_gaussian(bsize=bsize, c=c)
         elif "mean" in algorithm:
             bsize = 5
-            v = self.threshold_adaptive_mean(bsize=bsize, c=0)
+            v = self.threshold_adaptive_mean(bsize=bsize, c=c)
         elif "global" in algorithm:
             v = self.threshold_global()
         elif "isodata" in algorithm:
@@ -182,58 +179,28 @@ class Threshold(Common) :
         image.algorithm = algorithm
 
         return image
-
     pass  # -- threshold_li
 
     @profile
-    def threshold_adaptive_mean(self, bsize=3, c=0):
+    def threshold_yen(self):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
-        # TODO     지역 평균 적응 임계치 처리
-
-        reverse_required = 1
+        from skimage import filters
 
         image = self.image
 
         img = image.img
 
-        w, h = image.dimension()
+        thresh = filters.threshold_yen( img )
 
-        data = np.empty((h, w), dtype='B')
+        data = img > thresh
 
-        b = int(bsize / 2)
-        if b < 1:
-            b = 1
-        pass
-
-        for y, row in enumerate(img):
-            for x, gs in enumerate(row):
-                y0 = y - b
-                x0 = x - b
-
-                if y0 < 0:
-                    y0 = 0
-                pass
-
-                if x0 < 0:
-                    x0 = 0
-                pass
-
-                window = img[y0: y + b + 1, x0: x + b + 1]
-                window_avg = np.average(window)
-                threshold = window_avg - c
-
-                data[y][x] = [0, 1][gs >= threshold]
-            pass
-        pass
-
-        image = Image( data )
-        image.threshold = -1
-        image.algorithm = "adaptive mean"
-        image.reverse_required = reverse_required
+        image = Image(data)
+        image.algorithm = f"threshold_yen( {thresh:0.0f} )"
 
         return image
-    pass  # -- 지역 평균 적응 임계치 처리
+
+    pass  # -- threshold_yen
 
     @profile
     def threshold_otsu(self):
@@ -264,126 +231,83 @@ class Threshold(Common) :
     @profile
     def threshold_adaptive_gaussian(self, bsize=5, c=0):
         # TODO     지역 가우시안 적응 임계치 처리
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
-        algorithm = 0
+        # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html
 
-        if algorithm == 0 :
-            v = self.threshold_adaptive_gaussian_opencv(bsize=bsize, c=c)
-        elif algorithm == 1:
-            v = self.threshold_adaptive_gaussian_my(bsize=bsize, c=c)
+        image = self.image
+
+        reverse_required = 0
+
+        if bsize is None:
+            diagonal = image.diagonal()
+
+            bsize = diagonal/20
+            if bsize < 3 :
+                bsize = 3
+            pass
         pass
 
-        return v
-    pass # -- threshold_adaptive_gaussian
+        if c is None:
+            c = 0
+        pass
+
+        bsize = 2 * int(bsize / 2) + 1
+
+        img = image.img
+        img = img.astype(np.uint8)
+
+        data = cv.adaptiveThreshold(img, 1, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, bsize, c)
+
+        image = Image( data )
+        image.threshold = f"bsize = {bsize}"
+        image.algorithm = f"adaptive gaussian(bsize={bsize}, c={c})"
+        image.reverse_required = reverse_required
+
+        return image
+    pass  # -- threshold_adaptive_gaussian
 
     @profile
-    def threshold_adaptive_gaussian_opencv(self, bsize=5, c=0):
+    def threshold_adaptive_mean(self, bsize=5, c=0):
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        # TODO     지역 평균 적응 임계치 처리
+
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html
 
         reverse_required = 0
-        bsize = 2 * int(bsize / 2) + 1
 
         image = self.image
+
+        if bsize is None:
+            diagonal = image.diagonal()
+
+            bsize = diagonal/20
+            if bsize < 3 :
+                bsize = 3
+            pass
+        pass
+
+        if c is None:
+            c = 0
+        pass
+
+        bsize = 2 * int(bsize / 2) + 1
 
         img = image.img
         img = img.astype(np.uint8)
 
-        data = cv2.adaptiveThreshold(img, 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, bsize, c)
-
-        image = Image( data )
-        image.threshold = f"bsize = {bsize}"
-        image.algorithm = f"adaptive gaussian, bsize={bsize}"
-        image.reverse_required = reverse_required
-
-        return image
-    pass  # -- threshold_adaptive_gaussian_opencv
-
-    @profile
-    def threshold_adaptive_gaussian_my(self, bsize=3, c=0):
-        log.info(inspect.getframeinfo(inspect.currentframe()).function)
-
-        # https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html#getgaussiankernel
-
-        reverse_required = 1
-
-        bsize = 2 * int(bsize / 2) + 1
-
-        image = self.image
-
-        img = image.img
-
-        w, h = image.dimension()
-
-        data = np.empty((h, w), dtype='B')
-
-        b = int(bsize / 2)
-
-        if b < 1:
-            b = 1
-        pass
-
-        # the threshold value T(x,y) is a weighted sum (cross-correlation with a Gaussian window)
-        # of the blockSize×blockSize neighborhood of (x,y) minus C
-
-        image_pad = np.pad(img, b, 'constant', constant_values=(0))
-
-        def gaussian(x, y, bsize):
-            #  The default sigma is used for the specified blockSize
-            #sigma = bsize
-            # ksize	Aperture size. It should be odd ( ksizemod2=1 ) and positive.
-            sigma = 0.3 * ((bsize - 1) * 0.5 - 1) + 0.8
-            ss = sigma * sigma
-            pi_2_ss = 2 * math.pi * ss
-
-            b = int(bsize / 2)
-
-            x = x - b
-            y = y - b
-
-            v = math.exp(-(x * x + y * y) / ss) / pi_2_ss
-            # g(x,y) = exp( -(x^2 + y^2)/s^2 )/(2pi*s^2)
-
-            return v
-        pass  # -- gaussian
-
-        def gaussian_sum(window, bsize):
-            gs_sum = 0
-
-            # L = len( window )*len( window[0] )
-            for y, row in enumerate(window):
-                for x, v in enumerate(row):
-                    gs_sum += v * gaussian(y, x, bsize)
-                pass
-            pass
-
-            return gs_sum
-
-        pass  # -- gaussian_sum
-
-        bsize_square = bsize*bsize
-
-        for y, row in enumerate(image_pad):
-            for x, gs in enumerate(row):
-                if (b <= y < len(image_pad) - b) and (b <= x < len(row) - b):
-                    window = image_pad[y - b: y + b + 1, x - b: x + b + 1]
-
-                    gaussian_avg = gaussian_sum(window, bsize)/bsize_square
-
-                    threshold = gaussian_avg - c
-
-                    data[y - b][x - b] = [0, 1][gs >= threshold]
-                pass
-            pass
-        pass
+        data = cv.adaptiveThreshold(img, 1, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, bsize, c)
 
         image = Image(data)
-        image.threshold = f"bsize = {bsize}"
-        image.algorithm = "adaptive gaussian thresholding my"
+        image.algorithm = f"adaptive mean(bsize={bsize}, c={c})"
         image.reverse_required = reverse_required
 
         return image
-    pass  # -- 지역 가우시안 적응 임계치 처리
+
+    pass  # -- 지역 평균 적응 임계치 처리
+
 
 pass

@@ -64,7 +64,7 @@ class Image (Common) :
         fileHeader, ext = os.path.splitext( fileBase )
         ext = ext.lower()
 
-        if Image.clear_work_files and img_save_cnt == 0 :
+        if Image.clear_work_files and img_save_cnt == -1 :
             # fn_hdr 로 시작하는 모든 파일을 삭제함.
             import glob
             for f in glob.glob( f"{fileHeader}*" ):
@@ -430,7 +430,7 @@ class Image (Common) :
 
         cv.normalize(data, data.copy(), 0, 255, cv.NORM_MINMAX)
 
-        use_scale = False
+        use_scale = True
 
         if use_scale :
             # normalize to gray scale
@@ -439,14 +439,7 @@ class Image (Common) :
 
             data = (255/(max - min))*(data - min)
 
-            min = np.min(data)
-            max = np.max(data)
-            # -- # normalize to gray scale
-
-            data = data.astype(np.int)
-
-            min = np.min(data)
-            max = np.max(data)
+            #data = data.astype(np.int)
 
             log.info( f"min = {min}, max={max}")
         pass
@@ -480,6 +473,19 @@ class Image (Common) :
         pass
 
         data = cv.morphologyEx(img, cv.MORPH_GRADIENT, kernel)
+
+        use_scale = True
+        if use_scale :
+            # normalize to gray scale
+            min = np.min( data )
+            max = np.max( data )
+
+            data = (255/(max - min))*(data - min)
+
+            #data = data.astype(np.int)
+
+            log.info( f"min = {min}, max={max}")
+        pass
 
         return Image( img=data, algorithm=algorithm)
     pass  # -- gradient
@@ -536,12 +542,6 @@ class Image (Common) :
         max_img = np.max( img )
 
         edged = img
-
-        useCanny = True
-        if useCanny and max_img > 1 :
-            # Find Canny edges
-            edged = cv2.Canny(img, 5, 255 )
-        pass
 
         contours = []
 
@@ -676,12 +676,12 @@ class Image (Common) :
     pass # -- normalize_image_by_histogram
 
     @profile
-    def threshold(self, algorithm):
+    def threshold(self, algorithm, bsize=None, c=None):
         import Threshold
 
         threshold = Threshold.Threshold( image = self )
 
-        return threshold.threshold( algorithm = algorithm )
+        return threshold.threshold( algorithm = algorithm, bsize=bsize, c=c )
     pass # -- threshold
 
     @profile
