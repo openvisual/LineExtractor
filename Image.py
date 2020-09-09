@@ -9,6 +9,7 @@ from matplotlib.gridspec import GridSpec
 from functools import cmp_to_key
 
 import cv2, cv2 as cv
+from skimage import filters
 
 # utility import
 from Common import *
@@ -361,20 +362,63 @@ class Image (Common) :
     pass
 
     @profile
-    def convert_to_grayscale(self):
+    def to_grayscale(self):
         # grayscale 변환 함수
-
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
+        algorithm = "grayscale"
         img = self.img
 
         img = img.astype(np.uint8)
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        return Image(gray)
+        image = Image(gray)
+        image.algorithm = algorithm
 
-    pass  # -- convert_to_grayscale
+        return image
+    pass  # -- to_grayscale
+
+    @profile
+    def to_grayscale_multiotsu(self):
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        # https://scikit-image.org/docs/stable/api/skimage.filters.html#skimage.filters.threshold_multiotsu
+
+        img = self.img
+        img = img.astype(np.uint8)
+
+        h = len(img)
+        w = len(img[0])
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        norm = np.empty([h, w], np.uint8)
+
+        cv.normalize(gray, norm, 0, 255, cv.NORM_MINMAX)
+
+        # multi otsu
+        from skimage.color import label2rgb
+        thresholds = filters.threshold_multiotsu( norm )
+        regions = np.digitize( norm, bins=thresholds)
+        regions_colorized = label2rgb(regions)
+
+        from skimage import img_as_ubyte
+
+        regions_colorized = img_as_ubyte(regions_colorized)
+
+        # -- multi otsu
+
+        gray = cv2.cvtColor(regions_colorized, cv2.COLOR_BGR2GRAY)
+
+        data = gray
+
+        image = Image(data)
+        image.algorithm = f"grayscale_multiotsu"
+
+        return image
+
+    pass  # -- threshold_multiotsu
 
     @profile
     def reverse_image( self, max=None):
@@ -416,23 +460,13 @@ class Image (Common) :
 
         img = img.astype(np.float)
 
-        data = cv.Laplacian(img, cv.CV_64F)
+        laplacian = cv.Laplacian(img, cv.CV_64F)
 
-        cv.normalize(data, data.copy(), 0, 255, cv.NORM_MINMAX)
+        w, h = self.dimension()
 
-        use_scale = True
+        data = np.empty([h, w], dtype=img.dtype)
 
-        if use_scale :
-            # normalize to gray scale
-            min = np.min( data )
-            max = np.max( data )
-
-            data = (255/(max - min))*(data - min)
-
-            #data = data.astype(np.int)
-
-            log.info( f"min = {min}, max={max}")
-        pass
+        cv.normalize(laplacian, data, 0, 255, cv.NORM_MINMAX)
 
         return Image(img=data, algorithm=algorithm)
     pass  # -- laplacian
@@ -499,7 +533,7 @@ class Image (Common) :
 
         algorithm = f"canny(min={min}, max={max})"
 
-        data = cv2.Canny(img, min, max)
+        data = cv2.Canny(img, min, max )
 
         return Image(img=data, algorithm=algorithm)
 
@@ -581,9 +615,9 @@ class Image (Common) :
             log.info(f"org contours len = {len(contours)}")
             log.info(f"filters len = {len(filters)}")
 
-            cv2.polylines(data, filters, 0, (255, 255, 255), lineWidth)
+            cv2.polylines(data, filters, 0, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
         else :
-            cv2.drawContours(data, contours, -1, (255, 255, 255), lineWidth)
+            cv2.drawContours(data, contours, -1, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
         pass
 
         gray = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
@@ -594,7 +628,7 @@ class Image (Common) :
     pass  # -- contours
 
     @profile
-    def remove_noise(self, algorithm , ksize=5 ):
+    def remove_noise(self, algorithm , bsize=5 ):
         # TODO   잡음 제거
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -602,19 +636,19 @@ class Image (Common) :
 
         if algorithm == "gaussian blur"  :
             # Gaussian filtering
-            algorithm = f"{algorithm} ksize={ksize}"
+            algorithm = f"{algorithm} bsize={bsize}"
 
             img = img.astype(np.uint8)
-            data = cv.GaussianBlur(img, (ksize, ksize), 0)
+            data = cv.GaussianBlur(img, (bsize, bsize), 0)
         elif algorithm == "bilateralFilter" :
-            algorithm = f"{algorithm} ksize={ksize}, 75, 75"
+            algorithm = f"{algorithm} bsize={bsize}, 75, 75"
 
             img = img.astype(np.uint8)
-            data = cv2.bilateralFilter(img, ksize, 75, 75)
+            data = cv2.bilateralFilter(img, bsize, 75, 75)
         elif algorithm == "medianBlur" :
-            algorithm = f"{algorithm} ksize={ksize}"
+            algorithm = f"{algorithm} bsize={bsize}"
 
-            data = cv2.medianBlur(img, ksize)
+            data = cv2.medianBlur(img, bsize)
         pass
 
         return Image( img=data, algorithm=algorithm)
@@ -668,12 +702,12 @@ class Image (Common) :
     pass # -- normalize_image_by_histogram
 
     @profile
-    def threshold(self, algorithm, bsize=None, c=None):
+    def threshold(self, algorithm, thresh=None, bsize=None, c=None):
         import Threshold
 
         threshold = Threshold.Threshold( image = self )
 
-        return threshold.threshold( algorithm = algorithm, bsize=bsize, c=c )
+        return threshold.threshold( algorithm = algorithm, thresh=thresh, bsize=bsize, c=c )
     pass # -- threshold
 
     @profile

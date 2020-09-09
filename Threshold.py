@@ -12,7 +12,7 @@ class Threshold(Common) :
         self.image = image
     pass
 
-    def threshold(self, algorithm, bsize=5, c=0):
+    def threshold(self, algorithm, thresh=None, bsize=5, c=0):
         # TODO 이진화
 
         v = None
@@ -22,18 +22,13 @@ class Threshold(Common) :
         elif "yen" in algorithm:
             v = self.threshold_yen()
         elif "otsu" in algorithm:
-            if "multi" in algorithm :
-                v = self.threshold_multiotsu()
-            else :
-                v = self.threshold_otsu()
-            pass
+            v = self.threshold_otsu()
         elif "gaussian" in algorithm:
             v = self.threshold_adaptive_gaussian(bsize=bsize, c=c)
         elif "mean" in algorithm:
-            bsize = 5
             v = self.threshold_adaptive_mean(bsize=bsize, c=c)
         elif "global" in algorithm:
-            v = self.threshold_global()
+            v = self.threshold_global(thresh=thresh)
         elif "isodata" in algorithm:
             v = self.threshold_isodata()
         elif "balanced" in algorithm:
@@ -45,7 +40,7 @@ class Threshold(Common) :
     pass  # -- threshold
 
     @profile
-    def threshold_global(self ):
+    def threshold_global(self, thresh=None ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         # TODO     전역 임계치 처리
@@ -54,26 +49,28 @@ class Threshold(Common) :
 
         img = image.img
 
-        histogram = image.histogram()
+        if thresh is None or thresh < 1 :
 
-        useMargin = False
-        margin = 0
-        if useMargin :
-            margin = 50
-            histogram[0: margin] = 0
+            histogram = image.histogram()
+
+            useMargin = False
+            margin = 0
+            if useMargin :
+                margin = 50
+                histogram[0: margin] = 0
+            pass
+
+            x = np.arange(0, len(histogram))
+
+            avg = margin + ( sum( histogram * x )/np.sum( histogram ) )
+
+            thresh = avg
         pass
 
-        x = np.arange(0, len(histogram))
-
-        avg = margin + ( sum( histogram * x )/np.sum( histogram ) )
-
-        threshold = avg
-
-        data = np.where( img >= threshold , 1, 0 )
+        data = np.where( img >= thresh , 1, 0 )
 
         image = Image( data )
-        image.threshold = threshold
-        image.algorithm = f"global thresholding ({ int(threshold) })"
+        image.algorithm = f"global thresholding ({ int(thresh) })"
 
         return image
     pass  # -- 전역 임계치 처리
@@ -215,44 +212,6 @@ class Threshold(Common) :
         image.algorithm = f"otsu threshold={threshold}"
 
         return image
-    pass  # -- threshold_otsu_opencv
-
-    @profile
-    def threshold_multiotsu(self):
-        log.info(inspect.getframeinfo(inspect.currentframe()).function)
-
-        # https://scikit-image.org/docs/stable/api/skimage.filters.html#skimage.filters.threshold_multiotsu
-
-        image = self.image
-
-        img = image.img
-        img = img.astype(np.uint8)
-
-        h = len( img )
-        w = len( img[0] )
-
-        from skimage.color import label2rgb
-        thresholds = filters.threshold_multiotsu( img )
-        regions = np.digitize(img, bins=thresholds)
-        regions_colorized = label2rgb(regions)
-
-        from skimage import img_as_ubyte
-
-        regions_colorized = img_as_ubyte(regions_colorized)
-
-        gray = cv2.cvtColor(regions_colorized, cv2.COLOR_BGR2GRAY)
-
-        #data = np.empty([h, w], dtype=img.dtype)
-
-        #cv.normalize(gray, data, 0, 255, cv.NORM_MINMAX)
-
-        data = gray
-
-        image = Image(data)
-        image.algorithm = f"multiotsu"
-
-        return image
-
     pass  # -- threshold_otsu_opencv
 
     @profile

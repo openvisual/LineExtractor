@@ -89,22 +89,26 @@ class LineExtractor ( Common ):
         curr_image = image_org
 
         if 1 : # -- grayscale 변환
-            grayscale = curr_image.convert_to_grayscale()
-            grayscale.reverse_image( max=255 )
-            grayscale.save_img_as_file( img_path, "grayscale" )
-            grayscale.plot_image(title="Grayscale", border_color = "green", qtUi=qtUi, mode=mode)
-            grayscale.plot_histogram(qtUi=qtUi, mode=mode)
+            #grayscale = curr_image.to_grayscale_multiotsu()
+            grayscale = curr_image.to_grayscale()
 
             curr_image = grayscale
+
+            #grayscale.reverse_image( max=255 )
+            grayscale.save_img_as_file( img_path, curr_image.algorithm )
+            grayscale.plot_image( title=curr_image.algorithm, border_color = "green", qtUi=qtUi, mode=mode)
+            grayscale.plot_histogram(qtUi=qtUi, mode=mode)
         pass
 
-        if 1 : # TODO 잡음 제거
-            ksize = 5
-            noise_removed = curr_image.remove_noise( algorithm="gaussian blur", ksize = ksize )
+        remove_noise = True
+        if remove_noise : # TODO 잡음 제거
+            bsize = 5
+            noise_removed = curr_image.remove_noise( algorithm="gaussian blur", bsize = bsize )
             curr_image = noise_removed
 
-            curr_image.save_img_as_file( img_path, f"noise_removed({curr_image.algorithm})" )
-            title = f"Noise removed ({curr_image.algorithm}, ksize={ksize})"
+            title = curr_image.algorithm
+
+            curr_image.save_img_as_file( img_path, curr_image.algorithm )
             curr_image.plot_image(title=title, border_color = "blue", qtUi=qtUi, mode=mode)
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass
@@ -121,7 +125,7 @@ class LineExtractor ( Common ):
 
         useLaplacian = False
         if useLaplacian : # TODO Laplacian
-            laplacian = curr_image.laplacian(bsize=7)
+            laplacian = curr_image.laplacian(bsize=3)
 
             curr_image = laplacian
 
@@ -130,7 +134,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- laplacian
 
-        useGradient = True
+        useGradient = not useLaplacian
         if useGradient:  # TODO Gradient
             gradient = curr_image.gradient(bsize=7, kernel_type="cross")
 
@@ -141,10 +145,9 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- gradient
 
-        useThread = False
+        useThread = True
         if useThread :  # TODO 이진화
-            #algorithm = "otsu"
-            algorithm = "multiotsu"
+            algorithm = "otsu"
             #algorithm = "isodata"
             #algorithm = "yen"
             #algorithm = "balanced"
@@ -152,7 +155,7 @@ class LineExtractor ( Common ):
             #algorithm = "adaptive_mean"
             #algorithm = "global"
 
-            bin_image = curr_image.threshold(algorithm=algorithm)
+            bin_image = curr_image.threshold(algorithm=algorithm, bsize=7, c=1, thresh=30)
 
             curr_image = bin_image
 
@@ -167,7 +170,7 @@ class LineExtractor ( Common ):
 
         use_morphology = False
         if use_morphology:  # TODO morphology
-            morphology = curr_image.morphology(is_open=1, bsize=3, iterations=1, kernel_type="cross")
+            morphology = curr_image.morphology(is_open=1, bsize=5, iterations=3, kernel_type="cross")
 
             curr_image = morphology
 
