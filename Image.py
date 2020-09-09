@@ -528,6 +528,8 @@ class Image (Common) :
         #mode = cv.RETR_TREE
         mode = cv2.RETR_EXTERNAL
         method = cv.CHAIN_APPROX_SIMPLE
+        method = cv.CHAIN_APPROX_TC89_L1
+        method = cv.CHAIN_APPROX_TC89_KCOS
 
         algorithm = f"contours(mode={mode}, method={method})"
 

@@ -184,7 +184,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- canny
 
-        useContour = False
+        useContour = True
         if useContour: # TODO Contour
             contour = curr_image.contours()
 
