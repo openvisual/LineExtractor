@@ -147,8 +147,8 @@ class LineExtractor ( Common ):
 
         useThread = True
         if useThread :  # TODO 이진화
-            algorithm = "otsu"
-            #algorithm = "isodata"
+            #algorithm = "otsu"
+            algorithm = "isodata"
             #algorithm = "yen"
             #algorithm = "balanced"
             #algorithm = "adaptive_gaussian"
