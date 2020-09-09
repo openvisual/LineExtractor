@@ -4,6 +4,8 @@ from Common import *
 from Image import Image
 import cv2, cv2 as cv
 
+from skimage import filters
+
 class Threshold(Common) :
 
     def __init__(self, image ):
@@ -20,7 +22,11 @@ class Threshold(Common) :
         elif "yen" in algorithm:
             v = self.threshold_yen()
         elif "otsu" in algorithm:
-            v = self.threshold_otsu()
+            if "multi" in algorithm :
+                v = self.threshold_multiotsu()
+            else :
+                v = self.threshold_otsu()
+            pass
         elif "gaussian" in algorithm:
             v = self.threshold_adaptive_gaussian(bsize=bsize, c=c)
         elif "mean" in algorithm:
@@ -43,8 +49,6 @@ class Threshold(Common) :
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         # TODO     전역 임계치 처리
-
-        reverse_required = 0
 
         image = self.image
 
@@ -70,7 +74,6 @@ class Threshold(Common) :
         image = Image( data )
         image.threshold = threshold
         image.algorithm = f"global thresholding ({ int(threshold) })"
-        image.reverse_required = reverse_required
 
         return image
     pass  # -- 전역 임계치 처리
@@ -78,8 +81,6 @@ class Threshold(Common) :
     @profile
     def threshold_isodata(self ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
-
-        reverse_required = 0
 
         image = self.image
         img = image.img
@@ -108,7 +109,6 @@ class Threshold(Common) :
         image = Image( data )
         image.threshold = threshold
         image.algorithm = f"threshold isodata ({ int(threshold) })"
-        image.reverse_required = reverse_required
 
         return image
     pass  # -- threshold_isodata
@@ -116,8 +116,6 @@ class Threshold(Common) :
     @profile
     def threshold_balanced( self ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
-
-        reverse_required = 0
 
         image = self.image
 
@@ -145,7 +143,6 @@ class Threshold(Common) :
         image = Image( data )
         image.threshold = threshold
         image.algorithm = f"threshold balanced ({ int(threshold) })"
-        image.reverse_required = reverse_required
 
         return image
     pass  # -- threshold_balanced
@@ -153,8 +150,6 @@ class Threshold(Common) :
     @profile
     def threshold_li(self ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
-
-        from skimage import filters
 
         def quantile_95(image):
             # you can use np.quantile(image, 0.95) if you have NumPy>=1.15
@@ -185,8 +180,6 @@ class Threshold(Common) :
     def threshold_yen(self):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
-        from skimage import filters
-
         image = self.image
 
         img = image.img
@@ -199,7 +192,6 @@ class Threshold(Common) :
         image.algorithm = f"threshold_yen( {thresh:0.0f} )"
 
         return image
-
     pass  # -- threshold_yen
 
     @profile
@@ -207,8 +199,6 @@ class Threshold(Common) :
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         # https: // docs.opencv.org / 3.4 / d7 / d4d / tutorial_py_thresholding.html
-
-        reverse_required = 0
 
         image = self.image
 
@@ -223,9 +213,46 @@ class Threshold(Common) :
         image = Image( data )
         image.threshold = threshold
         image.algorithm = f"otsu threshold={threshold}"
-        image.reverse_required = reverse_required
 
         return image
+    pass  # -- threshold_otsu_opencv
+
+    @profile
+    def threshold_multiotsu(self):
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        # https://scikit-image.org/docs/stable/api/skimage.filters.html#skimage.filters.threshold_multiotsu
+
+        image = self.image
+
+        img = image.img
+        img = img.astype(np.uint8)
+
+        h = len( img )
+        w = len( img[0] )
+
+        from skimage.color import label2rgb
+        thresholds = filters.threshold_multiotsu( img )
+        regions = np.digitize(img, bins=thresholds)
+        regions_colorized = label2rgb(regions)
+
+        from skimage import img_as_ubyte
+
+        regions_colorized = img_as_ubyte(regions_colorized)
+
+        gray = cv2.cvtColor(regions_colorized, cv2.COLOR_BGR2GRAY)
+
+        #data = np.empty([h, w], dtype=img.dtype)
+
+        #cv.normalize(gray, data, 0, 255, cv.NORM_MINMAX)
+
+        data = gray
+
+        image = Image(data)
+        image.algorithm = f"multiotsu"
+
+        return image
+
     pass  # -- threshold_otsu_opencv
 
     @profile
@@ -236,8 +263,6 @@ class Threshold(Common) :
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html
 
         image = self.image
-
-        reverse_required = 0
 
         if bsize is None:
             diagonal = image.diagonal()
@@ -262,7 +287,6 @@ class Threshold(Common) :
         image = Image( data )
         image.threshold = f"bsize = {bsize}"
         image.algorithm = f"adaptive gaussian(bsize={bsize}, c={c})"
-        image.reverse_required = reverse_required
 
         return image
     pass  # -- threshold_adaptive_gaussian
@@ -272,12 +296,7 @@ class Threshold(Common) :
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         # TODO     지역 평균 적응 임계치 처리
-
-        log.info(inspect.getframeinfo(inspect.currentframe()).function)
-
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html
-
-        reverse_required = 0
 
         image = self.image
 
@@ -303,7 +322,6 @@ class Threshold(Common) :
 
         image = Image(data)
         image.algorithm = f"adaptive mean(bsize={bsize}, c={c})"
-        image.reverse_required = reverse_required
 
         return image
 

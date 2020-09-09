@@ -120,7 +120,6 @@ class LineExtractor ( Common ):
         pass
 
         useLaplacian = False
-
         if useLaplacian : # TODO Laplacian
             laplacian = curr_image.laplacian(bsize=7)
 
@@ -129,10 +128,10 @@ class LineExtractor ( Common ):
             curr_image.save_img_as_file(img_path, curr_image.algorithm)
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
-        pass  # -- gradient
+        pass  # -- laplacian
 
-        useGradient = False
-        if useGradient : # TODO Gradient
+        useGradient = True
+        if useGradient:  # TODO Gradient
             gradient = curr_image.gradient(bsize=7, kernel_type="cross")
 
             curr_image = gradient
@@ -142,15 +141,16 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- gradient
 
-        useThread = True
+        useThread = False
         if useThread :  # TODO 이진화
-            #algorithm = "threshold_otsu"
-            #algorithm = "threshold_isodata"
-            #algorithm = "threshold_yen"
-            #algorithm = "threshold_balanced"
-            algorithm = "threshold_adaptive_gaussian"
-            #algorithm = "threshold_adaptive_mean"
-            #algorithm = "threshold_global"
+            #algorithm = "otsu"
+            algorithm = "multiotsu"
+            #algorithm = "isodata"
+            #algorithm = "yen"
+            #algorithm = "balanced"
+            #algorithm = "adaptive_gaussian"
+            #algorithm = "adaptive_mean"
+            #algorithm = "global"
 
             bin_image = curr_image.threshold(algorithm=algorithm)
 
@@ -165,7 +165,7 @@ class LineExtractor ( Common ):
             curr_image.plot_image(title=title, border_color="blue", qtUi=qtUi, mode=mode)
         pass  # -- 이진화
 
-        use_morphology = True
+        use_morphology = False
         if use_morphology:  # TODO morphology
             morphology = curr_image.morphology(is_open=1, bsize=3, iterations=1, kernel_type="cross")
 
@@ -175,7 +175,7 @@ class LineExtractor ( Common ):
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
         pass  # -- morphology
 
-        useCanny = False
+        useCanny = True
         if useCanny:
             canny = curr_image.canny(min=1, max=255)
 
@@ -186,7 +186,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- canny
 
-        useContour = False
+        useContour = True
         if useContour: # TODO Contour
             contour = curr_image.contours()
 

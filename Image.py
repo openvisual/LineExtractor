@@ -331,32 +331,6 @@ class Image (Common) :
 
     # -- 통계 함수
 
-    # grayscale 변환 함수
-    def convert_to_grayscale( self ) :
-        log.info( "Convert to grayscale...." )
-
-        img = self.img
-
-        # TODO   채널 분리
-        # b, g, r 채널 획득
-        # cv2.imread() 는 b, g, r 순서대로 배열에서 반환한다.
-        b_channel = img[:, :, 0].copy()
-        g_channel = img[:, :, 1].copy()
-        r_channel = img[:, :, 2].copy()
-
-        # RGB -> GrayScale 변환 공식
-        # average  Y = (R + G + B / 3)
-        # weighted Y = (0.3 * R) + (0.59 * G) + (0.11 * B)
-        # Colorimetric conversion Y = 0.2126R + 0.7152G  0.0722B
-        # OpenCV CCIR Y = 0.299 R + 0.587 G + 0.114 B
-
-        grayscale = r_channel*0.299 + g_channel*0.587 + b_channel*0.114
-
-        grayscale = grayscale.astype( np.int16 )
-
-        return Image( grayscale )
-    pass # -- convert_to_grayscale
-
     def width(self):
         # image width
         img = self.img
@@ -385,6 +359,22 @@ class Image (Common) :
     def dimension_ratio(self):
         return self.width()/self.height()
     pass
+
+    @profile
+    def convert_to_grayscale(self):
+        # grayscale 변환 함수
+
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        img = self.img
+
+        img = img.astype(np.uint8)
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        return Image(gray)
+
+    pass  # -- convert_to_grayscale
 
     @profile
     def reverse_image( self, max=None):
@@ -596,7 +586,9 @@ class Image (Common) :
             cv2.drawContours(data, contours, -1, (255, 255, 255), lineWidth)
         pass
 
-        data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+
+        _, data = cv.threshold(gray, 127, 255, cv.THRESH_BINARY)
 
         return Image( img=data, algorithm=algorithm)
     pass  # -- contours
