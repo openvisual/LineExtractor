@@ -155,11 +155,11 @@ class LineExtractor ( Common ):
             #algorithm = "isodata"
             #algorithm = "yen"
             #algorithm = "balanced"
-            algorithm = "adaptive_gaussian"
+            #algorithm = "adaptive_gaussian"
             #algorithm = "adaptive_mean"
-            #algorithm = "global"
+            algorithm = "global"
 
-            bin_image = curr_image.threshold(algorithm=algorithm, bsize=5, c=1, thresh=30)
+            bin_image = curr_image.threshold(algorithm=algorithm, bsize=21, c=1, thresh=15)
 
             curr_image = bin_image
 
@@ -174,7 +174,7 @@ class LineExtractor ( Common ):
 
         use_morphology = False
         if use_morphology:  # TODO morphology
-            morphology = curr_image.morphology(is_open=1, bsize=7, iterations=3, kernel_type="cross")
+            morphology = curr_image.morphology(is_open=1, bsize=3, iterations=20, kernel_type="cross")
 
             curr_image = morphology
 
@@ -184,7 +184,7 @@ class LineExtractor ( Common ):
 
         useCanny = True
         if useCanny:
-            canny = curr_image.canny(min=1, max=255)
+            canny = curr_image.canny(min=100, max=200)
 
             curr_image = canny
 
