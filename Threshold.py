@@ -224,12 +224,7 @@ class Threshold(Common) :
         image = self.image
 
         if bsize is None:
-            diagonal = image.diagonal()
-
-            bsize = diagonal/20
-            if bsize < 3 :
-                bsize = 3
-            pass
+            bsize = self.default_bsize(image)
         pass
 
         if c is None:
@@ -250,6 +245,17 @@ class Threshold(Common) :
         return image
     pass  # -- threshold_adaptive_gaussian
 
+    def default_bsize(self, image):
+        diagonal = image.diagonal()
+
+        bsize = diagonal // 150
+        if bsize < 3:
+            bsize = 3
+        pass
+
+        return bsize
+    pass # -- default_bsize
+
     @profile
     def threshold_adaptive_mean(self, bsize=5, c=0):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
@@ -260,12 +266,7 @@ class Threshold(Common) :
         image = self.image
 
         if bsize is None:
-            diagonal = image.diagonal()
-
-            bsize = diagonal/20
-            if bsize < 3 :
-                bsize = 3
-            pass
+            bsize = self.default_bsize( image )
         pass
 
         if c is None:

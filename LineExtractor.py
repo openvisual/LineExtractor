@@ -102,8 +102,12 @@ class LineExtractor ( Common ):
 
         remove_noise = True
         if remove_noise : # TODO 잡음 제거
-            bsize = 5
-            noise_removed = curr_image.remove_noise( algorithm="gaussian blur", bsize = bsize )
+            algorithm = "gaussianBlur"
+            algorithm = "bilateralFilter"
+            bsize = 7
+            sigmaColor = 75
+            sigmaSpace = 75
+            noise_removed = curr_image.remove_noise( algorithm=algorithm, bsize = bsize, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
             curr_image = noise_removed
 
             title = curr_image.algorithm
@@ -134,7 +138,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- laplacian
 
-        useGradient = not useLaplacian
+        useGradient = True
         if useGradient:  # TODO Gradient
             gradient = curr_image.gradient(bsize=7, kernel_type="cross")
 
@@ -148,14 +152,14 @@ class LineExtractor ( Common ):
         useThread = True
         if useThread :  # TODO 이진화
             #algorithm = "otsu"
-            algorithm = "isodata"
+            #algorithm = "isodata"
             #algorithm = "yen"
             #algorithm = "balanced"
-            #algorithm = "adaptive_gaussian"
+            algorithm = "adaptive_gaussian"
             #algorithm = "adaptive_mean"
             #algorithm = "global"
 
-            bin_image = curr_image.threshold(algorithm=algorithm, bsize=7, c=1, thresh=30)
+            bin_image = curr_image.threshold(algorithm=algorithm, bsize=5, c=1, thresh=30)
 
             curr_image = bin_image
 
@@ -170,7 +174,7 @@ class LineExtractor ( Common ):
 
         use_morphology = False
         if use_morphology:  # TODO morphology
-            morphology = curr_image.morphology(is_open=1, bsize=5, iterations=3, kernel_type="cross")
+            morphology = curr_image.morphology(is_open=1, bsize=7, iterations=3, kernel_type="cross")
 
             curr_image = morphology
 

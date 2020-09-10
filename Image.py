@@ -628,23 +628,23 @@ class Image (Common) :
     pass  # -- contours
 
     @profile
-    def remove_noise(self, algorithm , bsize=5 ):
+    def remove_noise(self, algorithm , bsize=5 , sigmaColor=75, sigmaSpace=75):
         # TODO   잡음 제거
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         img = self.img
 
-        if algorithm == "gaussian blur"  :
-            # Gaussian filtering
+        if algorithm == "gaussianBlur"  :
+            # Gaussian blur
             algorithm = f"{algorithm} bsize={bsize}"
 
             img = img.astype(np.uint8)
             data = cv.GaussianBlur(img, (bsize, bsize), 0)
         elif algorithm == "bilateralFilter" :
-            algorithm = f"{algorithm} bsize={bsize}, 75, 75"
+            algorithm = f"{algorithm} bsize={bsize}, sigmaColor={sigmaColor}, sigmaSpace={sigmaSpace}"
 
             img = img.astype(np.uint8)
-            data = cv2.bilateralFilter(img, bsize, 75, 75)
+            data = cv2.bilateralFilter(img, bsize, sigmaColor, sigmaSpace)
         elif algorithm == "medianBlur" :
             algorithm = f"{algorithm} bsize={bsize}"
 
