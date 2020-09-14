@@ -240,25 +240,40 @@ class Threshold(Common) :
 
         cv.normalize(gray, norm, 0, 255, cv.NORM_MINMAX)
 
+        data = None
+
         # multi otsu
         from skimage.color import label2rgb
         thresholds = filters.threshold_multiotsu(norm)
-        regions = np.digitize(norm, bins=thresholds)
 
         colorize = False
         if colorize:
+            regions = np.digitize(norm, bins=thresholds)
+
             regions_colorized = label2rgb(regions)
 
             from skimage import img_as_ubyte
 
             regions_colorized = img_as_ubyte(regions_colorized)
+
+            regions = regions.astype(np.uint8)
+
+            data = np.empty([h, w], dtype=np.uint8)
+
+            cv.normalize(regions, data, 0, 255, cv.NORM_MINMAX)
+        else :
+            data = gray
+
+            thresholds = np.sort( thresholds )
+            prev_thresh = 0
+
+            for thresh in thresholds :
+                data = np.where( (prev_thresh <= data) & (data < thresh), prev_thresh, data)
+                prev_thresh = thresh
+            pass
+
+            data = np.where( prev_thresh <= data , 255, data)
         pass
-
-        regions = regions.astype(np.uint8)
-
-        data = np.empty([h, w], dtype=np.uint8)
-
-        cv.normalize(regions, data, 0, 255, cv.NORM_MINMAX)
 
         image = Image(data)
         image.algorithm = f"multi_otsu"
