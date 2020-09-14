@@ -183,7 +183,7 @@ class LineExtractor ( Common ):
 
         useCanny = True
         if useCanny:
-            canny = curr_image.canny(min=100, max=200)
+            canny = curr_image.canny(min=1, max=255)
 
             curr_image = canny
 
@@ -194,7 +194,7 @@ class LineExtractor ( Common ):
 
         useContour = True
         if useContour: # TODO Contour
-            contour = curr_image.contours()
+            contour = curr_image.contours(lineWidth=2, useFilter=False)
 
             curr_image = contour
 

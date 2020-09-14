@@ -499,7 +499,7 @@ class Image (Common) :
     pass  # -- canny
 
     @profile
-    def contours(self, lineWidth=1):
+    def contours(self, lineWidth=1, useFilter = True):
         # TODO  등고선
         #  https://docs.opencv.org/trunk/d4/d73/tutorial_py_contours_begin.html
 
@@ -514,11 +514,11 @@ class Image (Common) :
         h = len( img )
         w = len( img[0] )
 
-        #mode = cv.RETR_TREE
-        mode = cv2.RETR_EXTERNAL
+        mode = cv.RETR_TREE
+        #mode = cv2.RETR_EXTERNAL
         method = cv.CHAIN_APPROX_SIMPLE
         method = cv.CHAIN_APPROX_TC89_L1
-        #method = cv.CHAIN_APPROX_TC89_KCOS
+        method = cv.CHAIN_APPROX_TC89_KCOS
 
         algorithm = f"contours(mode={mode}, method={method})"
 
@@ -547,10 +547,10 @@ class Image (Common) :
             ref_height = ref_width
             ref_area = w*h/10_000
 
-            for i, cnt in enumerate( contours ):
+            for i, contour in enumerate( contours ):
                 valid = True
                 if valid :
-                    rect = cv2.minAreaRect(cnt)
+                    rect = cv2.minAreaRect(contour)
 
                     rect_width = rect[1][0]
                     rect_height = rect[1][1]
@@ -561,13 +561,13 @@ class Image (Common) :
                 pass
 
                 if valid :
-                    arc_len = cv2.arcLength( cnt , 0 )
+                    arc_len = cv2.arcLength( contour , 0 )
                     debug and log.info( f"[{i:03d} contour = {arc_len}" )
                     valid = ( arc_len > ref_len )
                 pass
 
                 if valid :
-                    filters.append( cnt )
+                    filters.append( contour )
                 pass
             pass
 
