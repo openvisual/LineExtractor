@@ -405,13 +405,20 @@ class Image (Common) :
         from skimage.color import label2rgb
         thresholds = filters.threshold_multiotsu( norm )
         regions = np.digitize( norm, bins=thresholds)
-        regions_colorized = label2rgb(regions)
 
-        from skimage import img_as_ubyte
+        colorize = False
+        if colorize :
+            regions_colorized = label2rgb(regions)
 
-        regions_colorized = img_as_ubyte(regions_colorized)
+            from skimage import img_as_ubyte
 
-        data = regions_colorized
+            regions_colorized = img_as_ubyte(regions_colorized)
+        pass
+
+        data = regions
+
+        # normalization
+        data = data * ( 255 / data.max(axis=0) )
 
         image = Image(data)
         image.algorithm = f"grayscale_multiotsu"
