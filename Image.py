@@ -380,51 +380,6 @@ class Image (Common) :
     pass  # -- to_grayscale
 
     @profile
-    def multi_otsu(self):
-        log.info(inspect.getframeinfo(inspect.currentframe()).function)
-
-        # https://scikit-image.org/docs/stable/api/skimage.filters.html#skimage.filters.threshold_multiotsu
-
-        img = self.img
-        img = img.astype(np.uint8)
-
-        h = len(img)
-        w = len(img[0])
-
-        gray = img
-
-        if isinstance( img[0][0] , list ) and len( img[0][0] ) == 3 :
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        pass
-
-        norm = np.empty([h, w], np.uint8)
-
-        cv.normalize(gray, norm, 0, 255, cv.NORM_MINMAX)
-
-        # multi otsu
-        from skimage.color import label2rgb
-        thresholds = filters.threshold_multiotsu( norm )
-        regions = np.digitize( norm, bins=thresholds)
-
-        colorize = False
-        if colorize :
-            regions_colorized = label2rgb(regions)
-
-            from skimage import img_as_ubyte
-
-            regions_colorized = img_as_ubyte(regions_colorized)
-        pass
-
-        data = regions
-
-        image = Image(data)
-        image.algorithm = f"grayscale_multiotsu"
-
-        return image
-
-    pass  # -- threshold_multiotsu
-
-    @profile
     def reverse_image( self, max=None):
         # TODO   영상 역전 함수
 

@@ -21,6 +21,8 @@ class Threshold(Common) :
             v = self.threshold_li()
         elif "yen" in algorithm:
             v = self.threshold_yen()
+        elif "multi_otsu" in algorithm:
+            v = self.threshold_multi_otsu()
         elif "otsu" in algorithm:
             v = self.threshold_otsu()
         elif "gaussian" in algorithm:
@@ -213,6 +215,56 @@ class Threshold(Common) :
 
         return image
     pass  # -- threshold_otsu_opencv
+
+    @profile
+    def threshold_multi_otsu(self):
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        # https://scikit-image.org/docs/stable/api/skimage.filters.html#skimage.filters.threshold_multiotsu
+
+        image = self.image
+
+        img = image.img
+        img = img.astype(np.uint8)
+
+        h = len(img)
+        w = len(img[0])
+
+        gray = img
+
+        if isinstance(img[0][0], list) and len(img[0][0]) == 3:
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        pass
+
+        norm = np.empty([h, w], np.uint8)
+
+        cv.normalize(gray, norm, 0, 255, cv.NORM_MINMAX)
+
+        # multi otsu
+        from skimage.color import label2rgb
+        thresholds = filters.threshold_multiotsu(norm)
+        regions = np.digitize(norm, bins=thresholds)
+
+        colorize = False
+        if colorize:
+            regions_colorized = label2rgb(regions)
+
+            from skimage import img_as_ubyte
+
+            regions_colorized = img_as_ubyte(regions_colorized)
+        pass
+
+        regions = regions.astype(np.uint8)
+
+        data = np.empty([h, w], dtype=np.uint8)
+
+        cv.normalize(regions, data, 0, 255, cv.NORM_MINMAX)
+
+        image = Image(data)
+        image.algorithm = f"multiotsu"
+
+        return image
+    pass  # -- threshold_multiotsu
 
     @profile
     def threshold_adaptive_gaussian(self, bsize=5, c=0):

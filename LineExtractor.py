@@ -125,14 +125,6 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass
 
-        use_multiotsu = True
-        if use_multiotsu : # multiotsu
-            multi_otsu = curr_image.multi_otsu()
-
-            multi_otsu.save_img_as_file( img_path, multi_otsu.algorithm )
-            multi_otsu.plot_image( title=multi_otsu.algorithm, qtUi=qtUi, mode=mode)
-        pass
-
         useLaplacian = False
         if useLaplacian : # TODO Laplacian
             laplacian = curr_image.laplacian(bsize=3)
@@ -144,7 +136,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- laplacian
 
-        useGradient = True
+        useGradient = False
         if useGradient:  # TODO Gradient
             gradient = curr_image.gradient(bsize=7, kernel_type="cross")
 
@@ -157,13 +149,14 @@ class LineExtractor ( Common ):
 
         useThread = True
         if useThread :  # TODO 이진화
+            algorithm = "multi_otsu"
             #algorithm = "otsu"
             #algorithm = "isodata"
             #algorithm = "yen"
             #algorithm = "balanced"
             #algorithm = "adaptive_gaussian"
             #algorithm = "adaptive_mean"
-            algorithm = "global"
+            #algorithm = "global"
 
             bin_image = curr_image.threshold(algorithm=algorithm, bsize=21, c=1, thresh=15)
 
