@@ -242,9 +242,11 @@ class Threshold(Common) :
 
         data = None
 
+        classes = 5
+
         # multi otsu
         from skimage.color import label2rgb
-        thresholds = filters.threshold_multiotsu(norm, classes=6)
+        thresholds = filters.threshold_multiotsu(norm, classes=classes)
 
         colorize = False
         if colorize:
@@ -276,7 +278,7 @@ class Threshold(Common) :
         pass
 
         image = Image(data)
-        image.algorithm = f"multi_otsu"
+        image.algorithm = f"multi_otsu(classes={classes})"
 
         return image
     pass  # -- threshold_multiotsu
