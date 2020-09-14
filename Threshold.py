@@ -261,7 +261,7 @@ class Threshold(Common) :
         cv.normalize(regions, data, 0, 255, cv.NORM_MINMAX)
 
         image = Image(data)
-        image.algorithm = f"multiotsu"
+        image.algorithm = f"multi_otsu"
 
         return image
     pass  # -- threshold_multiotsu
