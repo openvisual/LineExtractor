@@ -25,9 +25,6 @@ class LineExtractor ( Common ):
 
         Image.img_save_cnt = 0
 
-        # TODO    원천 이미지 획득
-        # 이미지를 파일로 부터 RGB 색상으로 읽어들인다.
-
         if 1 :
             pass
         elif os.path.exists( img_path ) and os.path.isdir( img_path ):
@@ -40,7 +37,8 @@ class LineExtractor ( Common ):
 
         prev_dir = os.getcwd()
 
-        if 1 :
+        if True :
+            # 이미지 파일이 있는 폴더로 경로를 이동함.
             fileName = img_path
             directory = os.path.dirname(fileName)
             fileBaseName = os.path.basename(fileName)
@@ -90,7 +88,7 @@ class LineExtractor ( Common ):
 
         if 1 : # -- grayscale 변환
             #grayscale = curr_image.to_grayscale_multiotsu()
-            grayscale = curr_image.to_grayscale()
+            grayscale = curr_image.grayscale()
 
             curr_image = grayscale
 
@@ -125,6 +123,14 @@ class LineExtractor ( Common ):
             curr_image.save_img_as_file( img_path, "image_normalized" )
             curr_image.plot_image(title="Normalization", border_color = "green", qtUi=qtUi, mode=mode)
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
+        pass
+
+        use_multiotsu = True
+        if use_multiotsu : # multiotsu
+            multi_otsu = curr_image.multi_otsu()
+
+            multi_otsu.save_img_as_file( img_path, multi_otsu.algorithm )
+            multi_otsu.plot_image( title=multi_otsu.algorithm, qtUi=qtUi, mode=mode)
         pass
 
         useLaplacian = False

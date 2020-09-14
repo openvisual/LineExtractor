@@ -362,7 +362,7 @@ class Image (Common) :
     pass
 
     @profile
-    def to_grayscale(self):
+    def grayscale(self):
         # grayscale 변환 함수
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -380,7 +380,7 @@ class Image (Common) :
     pass  # -- to_grayscale
 
     @profile
-    def to_grayscale_multiotsu(self):
+    def multi_otsu(self):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         # https://scikit-image.org/docs/stable/api/skimage.filters.html#skimage.filters.threshold_multiotsu
@@ -391,7 +391,11 @@ class Image (Common) :
         h = len(img)
         w = len(img[0])
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = img
+
+        if isinstance( img[0][0] , list ) and len( img[0][0] ) == 3 :
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        pass
 
         norm = np.empty([h, w], np.uint8)
 
@@ -407,11 +411,7 @@ class Image (Common) :
 
         regions_colorized = img_as_ubyte(regions_colorized)
 
-        # -- multi otsu
-
-        gray = cv2.cvtColor(regions_colorized, cv2.COLOR_BGR2GRAY)
-
-        data = gray
+        data = regions_colorized
 
         image = Image(data)
         image.algorithm = f"grayscale_multiotsu"
