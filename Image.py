@@ -417,9 +417,6 @@ class Image (Common) :
 
         data = regions
 
-        # normalization
-        data = data * ( 255 / data.max(axis=0) )
-
         image = Image(data)
         image.algorithm = f"grayscale_multiotsu"
 
