@@ -244,7 +244,7 @@ class Threshold(Common) :
 
         # multi otsu
         from skimage.color import label2rgb
-        thresholds = filters.threshold_multiotsu(norm)
+        thresholds = filters.threshold_multiotsu(norm, classes=6)
 
         colorize = False
         if colorize:
@@ -268,11 +268,11 @@ class Threshold(Common) :
             prev_thresh = 0
 
             for thresh in thresholds :
-                data = np.where( (prev_thresh <= data) & (data < thresh), prev_thresh, data)
+                data = np.where( (prev_thresh < data) & (data <= thresh), thresh, data)
                 prev_thresh = thresh
             pass
 
-            data = np.where( prev_thresh <= data , 255, data)
+            data = np.where( prev_thresh < data , 255, data)
         pass
 
         image = Image(data)
