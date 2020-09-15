@@ -142,46 +142,6 @@ class Line:
         return a.slope_radian() - b.slope_radian()
     pass
 
-    @staticmethod
-    def merge_lines( lines, error_deg=1, snap_dist=5 ):
-        debug = False
-        lines = lines.copy()
-
-        line_merged = True
-
-        while line_merged :
-            line_merged = False
-
-            i = 0
-            lines = sorted(lines, key=cmp_to_key(Line.compare_line_slope))
-
-            while i < ( len(lines) - 1) :
-                j = 0
-                while i < ( len(lines) - 1 ) and j < len(lines):
-                    merge_line = None
-
-                    if i is not j :
-                        merge_line = lines[i].merge(lines[j], error_deg=error_deg, snap_dist=snap_dist)
-                    pass
-
-                    if merge_line is not None:
-                        line_merged = True
-                        lines[i] = merge_line
-                        lines.pop(j)
-
-                        debug and log.info(f"Line({i}, {j}) are merged.")
-                    else:
-                        j += 1
-                    pass
-                pass
-
-                i += 1
-            pass
-        pass
-
-        return lines
-    pass # -- merge_lines
-
     def get_similarity(self, line_b):
         line_a = self
 

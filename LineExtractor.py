@@ -216,10 +216,17 @@ class LineExtractor ( Common ):
             hough = curr_image.plot_lines( lineList )
             hough.save_img_as_file(img_path, hough.algorithm)
 
-            lineList = curr_image.extract_lines( merge_lines=1, img_path=img_path)
+            error_deg = 2
+            snap_dist = int( curr_image.diagonal() / 150)
+
+            lineList = lineList.merge_lines(error_deg=error_deg, snap_dist=snap_dist)
+
             hough = curr_image.plot_lines( lineList )
-            hough.save_img_as_file(img_path, hough.algorithm)
-            hough.plot_image(title=hough.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
+
+            title = lineList.algorithm
+
+            hough.save_img_as_file(img_path, title)
+            hough.plot_image(title=title, border_color="blue", qtUi=qtUi, mode=mode)
         pass
 
         if lineList is not None and lineListA is not None :

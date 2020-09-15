@@ -4,6 +4,9 @@ import logging as log
 log.basicConfig( format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)04d] %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=log.INFO )
 
 import math
+from functools import cmp_to_key
+
+from Line import *
 
 class LineList( list ) :
     def __init__(self, lines=[], algorithm="", w = 0 , h = 0, fileBase="", mode=""):
@@ -75,4 +78,51 @@ class LineList( list ) :
         pass
 
     pass # -- save_as_json
+
+    def merge_lines(self, error_deg=1, snap_dist=5):
+        debug = False
+        lines = self.copy()
+
+        line_merged = True
+
+        while line_merged:
+            line_merged = False
+
+            i = 0
+            lines = sorted(lines, key=cmp_to_key(Line.compare_line_slope))
+
+            while i < (len(lines) - 1):
+                j = 0
+                while i < (len(lines) - 1) and j < len(lines):
+                    merge_line = None
+
+                    if i is not j:
+                        merge_line = lines[i].merge(lines[j], error_deg=error_deg, snap_dist=snap_dist)
+                    pass
+
+                    if merge_line is not None:
+                        line_merged = True
+                        lines[i] = merge_line
+                        lines.pop(j)
+
+                        debug and log.info(f"Line({i}, {j}) are merged.")
+                    else:
+                        j += 1
+                    pass
+                pass
+
+                i += 1
+            pass
+        pass
+
+        lines = sorted(lines, key=cmp_to_key(Line.compare_line_length))
+        lines = lines[:: -1]
+
+        lineList = LineList(lines = lines, algorithm=self.algorithm, w=self.w, h=self.h, fileBase=self.fileBase, mode=self.mode)
+        lineList.algorithm = f"{self.algorithm} merge(error_deg={error_deg}, snap={snap_dist})"
+
+        return lineList
+
+    pass  # -- merge_lines
+
 pass # -- LineList
