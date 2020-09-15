@@ -5,10 +5,10 @@ log.basicConfig( format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)04d]
 
 import math
 
-class LineList :
+class LineList( list ) :
     def __init__(self, lines=[], algorithm="", w = 0 , h = 0, fileBase="", mode=""):
+        self.extend( lines )
         self.mode = mode
-        self.lines = lines
         self.algorithm = algorithm
 
         self.w = w
@@ -21,10 +21,6 @@ class LineList :
         self.lineListIdentified = None
     pass # -- __init__
 
-    def extend(self, lineList ):
-        self.lines.extend( lineList.lines )
-    pass
-
     def line_identify(self, lineList_b):
         fileBase = self.fileBase
 
@@ -34,7 +30,7 @@ class LineList :
 
         lines_identified = []
 
-        for line in self.lines :
+        for line in self  :
             line_identified = line.get_identified_line(lineList_b)
             if line_identified :
                 line.line_identified = line_identified
@@ -54,7 +50,7 @@ class LineList :
         #data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
         data = {}
 
-        lines = self.lines
+        lines = self
 
         for i, lineA in enumerate( lines ) :
             line_data = {}

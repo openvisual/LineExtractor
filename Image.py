@@ -792,7 +792,6 @@ class Image (Common) :
     def plot_lines(self, lineList ):
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
-        lines = lineList.lines
         algorithm = lineList.algorithm
 
         # colors
@@ -837,7 +836,7 @@ class Image (Common) :
         radius = radius if radius > 5 else 5
         thickness = 3
 
-        for i, line in enumerate( lines ) :
+        for i, line in enumerate( lineList ) :
             color = colors[i % colors_len]
             thickness = line.thickness()
 
@@ -852,8 +851,6 @@ class Image (Common) :
 
         image = Image(data)
         image.algorithm = algorithm
-
-        log.info(f"Done. {inspect.getframeinfo(inspect.currentframe()).function}")
 
         return image
     pass # plot_lines

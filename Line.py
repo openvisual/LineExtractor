@@ -248,12 +248,10 @@ class Line:
 
     def get_identified_line(self, lineList ):
 
-        lines = lineList.lines
-
         line_found = None
         similarity_min = 100_000
 
-        for line_b in lines:
+        for line_b in lineList:
             similarity = self.get_similarity( line_b )
             if similarity < similarity_min :
                 similarity_min = similarity

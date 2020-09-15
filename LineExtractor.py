@@ -257,7 +257,7 @@ if __name__ == '__main__':
 
     if 1 :
         img_path = "./data_yegan/set_01/_1018843.JPG"
-        img_path = "./data_yegan/set_01/_1018885.JPG"
+        #img_path = "./data_yegan/set_01/_1018885.JPG"
     pass
 
     if img_path :
