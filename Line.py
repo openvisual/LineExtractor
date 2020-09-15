@@ -11,7 +11,7 @@ class Line:
 
     ID = 0
 
-    def __init__(self, a=None , b=None, line=None, fileBase="" ):
+    def __init__(self, a=None, b=None, line=None, fileBase="" ):
         self.id = Line.ID
         Line.ID += 1
 
@@ -134,7 +134,13 @@ class Line:
 
     @staticmethod
     def compare_line_length(a, b):
-        return a.distum() - b.distum()
+        cmp = a.distum() - b.distum()
+
+        if cmp == 0 :
+            cmp = a.slope_radian() - b.slope_radian()
+        pass
+
+        return cmp
     pass
 
     @staticmethod
@@ -166,6 +172,42 @@ class Line:
 
         return similarity
     pass # -- get_similarity
+
+    def get_most_mergable_line_from_lines(self, lineList, error_deg=1, snap_dist=5 ):
+        line_found = None
+        similarity_min = 100_000
+
+        for line in lineList :
+            if self.is_mergeable( line, error_deg=error_deg, snap_dist=snap_dist) :
+                similarity = self.get_similarity(line)
+                if similarity < similarity_min:
+                    line_found = line
+                    similarity_min = similarity
+                pass
+            pass
+        pass
+
+        return line_found, similarity_min
+
+    pass  # --get_most_similar_line_from_list
+
+    def get_most_mergable_line_from_linegrps(self, lineGrpList , error_deg=1, snap_dist=5 ):
+        lineGrp_found = None
+        line_found = None
+        similarity_min = 100_000
+
+        for lineGrp in lineGrpList:
+            line, similarity = self.get_most_mergable_line_from_lines( lineGrp, error_deg=error_deg, snap_dist=snap_dist )
+            if similarity < similarity_min:
+                lineGrp_found = lineGrp
+                line_found = line
+                similarity_min = similarity
+            pass
+        pass
+
+        return line_found, similarity_min, lineGrp_found
+
+    pass  # --get_most_similar_line_from_linegrp_list
 
     def get_identified_line(self, lineList ):
 

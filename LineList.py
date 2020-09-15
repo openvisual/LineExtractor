@@ -7,6 +7,7 @@ import math
 from functools import cmp_to_key
 
 from Line import *
+from Common import profile
 
 class LineList( list ) :
     def __init__(self, lines=[], algorithm="", w = 0 , h = 0, fileBase="", mode=""):
@@ -79,7 +80,76 @@ class LineList( list ) :
 
     pass # -- save_as_json
 
+    @profile
     def merge_lines(self, error_deg=1, snap_dist=5):
+        debug = False
+
+        lines = self
+
+        lineGroups = []
+
+        for line in lines :
+            line_found, _, lineGrp_found = line.get_most_mergable_line_from_linegrps( lineGroups, error_deg=error_deg, snap_dist=snap_dist )
+            if line_found is not None :
+                lineGrp_found.append( line )
+            else :
+                lineGroups.append( [ line ] )
+            pass
+        pass
+
+        merge_lines = []
+        for lineGrp in lineGroups :
+            merge_lines.append( LineList.merge_into_single_line( lineGrp ) )
+        pass
+
+        merge_lines = sorted(merge_lines, key=cmp_to_key(Line.compare_line_length))
+        merge_lines = merge_lines[:: -1]
+
+        lineList = LineList(lines=merge_lines, algorithm=self.algorithm, w=self.w, h=self.h, fileBase=self.fileBase, mode=self.mode)
+        lineList.algorithm = f"{self.algorithm} merge(error_deg={error_deg}, snap={snap_dist})"
+
+        return lineList
+
+    pass  # -- merge_lines
+
+    @staticmethod
+    def merge_into_single_line( lines ):
+        debug = False
+
+        slope_rad_length_sum = 0
+        length_sum = 0
+
+        for line in lines :
+            slope_rad_length_sum += line.slope_radian()
+            length_sum += line.length()
+        pass
+
+        slope_rad = slope_rad_length_sum/length_sum
+        slope_rad = slope_rad % (2*math.pi)
+
+        line = lines[0]
+        min_a = line.a if line.a.x < line.b.x else line.b
+        max_b = line.a if line.a.x > line.b.x else line.b
+
+        for line in lines :
+            points = [ line.a, line.b ]
+
+            for p in points :
+                if p.x < min_a.x :
+                    min_a = p
+                elif line.a.x > max_b.x :
+                    max_b = p
+                pass
+            pass
+        pass
+
+        line = Line( a = min_a, b = max_b )
+
+        return line
+    pass
+
+    @profile
+    def merge_lines_old(self, error_deg=1, snap_dist=5):
         debug = False
         lines = self.copy()
 
@@ -118,11 +188,12 @@ class LineList( list ) :
         lines = sorted(lines, key=cmp_to_key(Line.compare_line_length))
         lines = lines[:: -1]
 
-        lineList = LineList(lines = lines, algorithm=self.algorithm, w=self.w, h=self.h, fileBase=self.fileBase, mode=self.mode)
+        lineList = LineList(lines=lines, algorithm=self.algorithm, w=self.w, h=self.h, fileBase=self.fileBase,
+                            mode=self.mode)
         lineList.algorithm = f"{self.algorithm} merge(error_deg={error_deg}, snap={snap_dist})"
 
         return lineList
 
-    pass  # -- merge_lines
+    pass  # -- merge_lines old
 
 pass # -- LineList
