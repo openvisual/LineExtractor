@@ -16,12 +16,12 @@ class Line:
         Line.ID += 1
 
         if line is not None :
-            self.a = Point(line[0], line[1])
-            self.b = Point(line[2], line[3])
-        else :
-            self.a = a
-            self.b = b
+            a = Point(line[0], line[1])
+            b = Point(line[2], line[3])
         pass
+
+        self.a = a if a.x < b.x else b
+        self.b = a if a.x > b.x else b
 
         self.fileBase = fileBase
         self.line_identified = None

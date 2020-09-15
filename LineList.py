@@ -129,7 +129,7 @@ class LineList( list ) :
 
         line = lines[0]
         min_a = line.a if line.a.x < line.b.x else line.b
-        max_b = line.a if line.a.x > line.b.x else line.b
+        max_b = line.b if line.b.x > line.a.x else line.a
 
         for line in lines :
             points = [ line.a, line.b ]
@@ -137,7 +137,7 @@ class LineList( list ) :
             for p in points :
                 if p.x < min_a.x :
                     min_a = p
-                elif line.a.x > max_b.x :
+                elif p.x > max_b.x :
                     max_b = p
                 pass
             pass
