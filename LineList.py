@@ -32,7 +32,7 @@ class LineList( list ) :
 
         for line in self  :
             line_identified = line.get_identified_line(lineList_b)
-            if line_identified :
+            if line_identified is not None :
                 line.line_identified = line_identified
 
                 lines_identified.append( line )
