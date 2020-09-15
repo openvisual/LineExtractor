@@ -219,8 +219,7 @@ class LineExtractor ( Common ):
         if lineList is not None and lineListA is not None :
             log.info( "Line tagging....")
 
-            snapDeg = 20
-            lineListIdentified = lineListA.line_identify( lineList, snapDeg=snapDeg, snapDistRatio=0.1 )
+            lineListIdentified = lineListA.line_identify( lineList )
 
             identify = curr_image.plot_lines( lineListIdentified )
             identify.save_img_as_file(img_path, "identify")

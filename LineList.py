@@ -25,8 +25,9 @@ class LineList :
         self.lines.extend( lineList.lines )
     pass
 
-    def line_identify(self, lineListB, snapDeg=10, snapDistRatio=0.1):
+    def line_identify(self, lineList_b):
         fileBase = self.fileBase
+
         w = self.w
         h = self.h
         algorithm = self.algorithm
@@ -34,7 +35,7 @@ class LineList :
         lines_identified = []
 
         for line in self.lines :
-            line_identified = line.get_identified_line( lineListB, snapDeg=snapDeg, snapDistRatio=snapDistRatio )
+            line_identified = line.get_identified_line(lineList_b)
             if line_identified :
                 line.line_identified = line_identified
 
@@ -42,7 +43,7 @@ class LineList :
             pass
         pass
 
-        lineList = LineList( lines = lines_identified, algorithm=algorithm, w=w, h= h, fileBase=fileBase)
+        lineList = LineList( lines = lines_identified, algorithm=algorithm, w=w, h=h, fileBase=fileBase)
 
         return lineList
     pass # -- identify

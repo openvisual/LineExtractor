@@ -221,66 +221,44 @@ class Line:
         return lines
     pass # -- merge_lines
 
-    def get_identified_line(self, lineList, snapDeg=None, snapDistRatio=0.1 ):
+    def get_similarity(self, line_b):
+        line_a = self
 
-        snapRad = (math.pi/180)*(snapDeg % 360)
+        two_pi = 2*math.pi
 
-        snapDist = lineList.diagonal * snapDistRatio
+        diff_rad_ratio = ( abs(line_a.slope_radian() - line_b.slope_radian()) % two_pi )/two_pi
 
-        lines_identified = []
+        a_length = line_a.length()
+        b_length = line_b.length()
+
+        max_length = max([a_length, b_length])
+
+        diff_len_ratio = abs(a_length - b_length) / max_length
+
+        dist_a = min( line_a.a.distance(line_b.a), line_a.a.distance(line_b.b))
+        dist_b = min( line_a.b.distance(line_b.a), line_a.b.distance(line_b.b))
+
+        dist = max([dist_a, dist_b])
+        dist_ratio = dist / max_length
+
+        similarity = (diff_rad_ratio + diff_len_ratio + dist_ratio)/3
+
+        return similarity
+    pass # -- get_similarity
+
+    def get_identified_line(self, lineList ):
 
         lines = lineList.lines
 
-        diagonal = lineList.diagonal
-
-        ref_line = self
-
-        ref_slope_rad = ref_line.slope_radian()
-        ref_line_len = ref_line.length()
-
-        two_pi = 2 * math.pi
-
-        for line in lines:
-            valid = True
-
-            if valid :
-                slope_rad = line.slope_radian()
-                diff_rad = abs(slope_rad - ref_slope_rad) % two_pi
-                if diff_rad > snapRad :
-                    valid = False
-                pass
-            pass
-
-            if valid :
-                line_len = line.length()
-                diff_len_ratio = abs(ref_line_len - line_len) / max([ref_line_len, line_len])
-                if diff_len_ratio > snapDistRatio:
-                    valid = False
-                pass
-            pass
-
-            if valid :
-                dist_a = min( ref_line.a.distance( line.a ) , ref_line.a.distance(line.b ) )
-                dist_b = min( ref_line.b.distance( line.a ) , ref_line.b.distance(line.b ) )
-
-                dist = max( [dist_a, dist_b] )
-                dist_ratio = dist/diagonal
-
-                if dist_ratio > snapDistRatio :
-                    valid = False
-                pass
-
-            if valid :
-                lines_identified.append(line)
-            pass
-        pass
-
-        lines_identified = sorted(lines_identified, key=cmp_to_key(Line.compare_line_length))
-
         line_found = None
+        similarity_min = 100_000
 
-        if lines_identified :
-            line_found = lines_identified[ -1 ]
+        for line_b in lines:
+            similarity = self.get_similarity( line_b )
+            if similarity < similarity_min :
+                similarity_min = similarity
+                line_found = line_b
+            pass
         pass
 
         return line_found
