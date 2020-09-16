@@ -104,8 +104,7 @@ class LineList( list ) :
 
         merge_lines = []
         for lineGrp in lineGroups :
-            #merge_lines.append( LineList.merge_into_single_line( lineGrp ) )
-            merge_lines.extend(LineList.merge_into_single_line(lineGrp))
+            merge_lines.extend(LineList.merge_into_single_lines(lineGrp))
         pass
 
         merge_lines = sorted(merge_lines, key=cmp_to_key(Line.compare_line_length))
@@ -119,7 +118,7 @@ class LineList( list ) :
     pass  # -- merge_lines
 
     @staticmethod
-    def merge_into_single_line(lines, error_deg=1, snap_dist=5):
+    def merge_into_single_lines(lines, error_deg=1, snap_dist=5):
         debug = False
         lines = lines.copy()
 
