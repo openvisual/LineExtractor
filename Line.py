@@ -180,27 +180,6 @@ class Line:
         return merge_line
     pass # -- merge
 
-    def merge_old(self, line, error_deg=1, snap_dist=5 ):
-        merge_line = None
-        debug = 0
-
-        if self.is_mergeable( line , error_deg=error_deg, snap_dist=snap_dist) :
-            points = [self.a, self.b, line.a, line.b]
-
-            debug and log.info( f"points org = { ', '.join([str(p) for p in points]) }")
-
-            points = sorted(points, key=cmp_to_key(Point.compare_point_x))
-
-            debug and log.info( f"points sort = { ', '.join([str(p) for p in points]) }")
-
-            merge_line = Line( a = points[0], b = points[-1], fileBase=self.fileBase )
-
-            debug and log.info( f"merge line = {merge_line}")
-        pass
-
-        return merge_line
-    pass # -- merge
-
     @staticmethod
     def compare_line_length(a, b):
         cmp = a.distum() - b.distum()
