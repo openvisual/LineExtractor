@@ -179,7 +179,7 @@ class LineExtractor ( Common ):
 
         use_morphology = False
         if use_morphology:  # TODO morphology
-            morphology = curr_image.morphology(is_open=1, bsize=3, iterations=20, kernel_type="cross")
+            morphology = curr_image.morphology(is_open=1, bsize=7, iterations=3, kernel_type="cross")
 
             curr_image = morphology
 
@@ -198,7 +198,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- canny
 
-        useContour = True
+        useContour = useCanny
         if useContour: # TODO Contour
             contour = curr_image.contours(lineWidth=2, useFilter=True)
 
@@ -217,7 +217,7 @@ class LineExtractor ( Common ):
             hough.save_img_as_file(img_path, hough.algorithm)
 
             error_deg = 2
-            snap_dist = int( curr_image.diagonal() / 150)
+            snap_dist = 15
 
             lineList = lineList.merge_lines(error_deg=error_deg, snap_dist=snap_dist)
 
