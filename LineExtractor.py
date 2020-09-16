@@ -164,7 +164,8 @@ class LineExtractor ( Common ):
                 algorithm = "multi_otsu"
             pass
 
-            bin_image = curr_image.threshold(algorithm=algorithm, bsize=21, c=1, thresh=15)
+            thresh = 3
+            bin_image = curr_image.threshold(algorithm=algorithm, bsize=21, c=1, thresh=thresh)
 
             curr_image = bin_image
 

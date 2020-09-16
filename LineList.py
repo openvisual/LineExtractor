@@ -89,6 +89,8 @@ class LineList( list ) :
 
         lines = self
 
+        lines = list(filter(lambda x: x.length() > 10, lines))
+
         lineGroups = []
 
         for line in lines :

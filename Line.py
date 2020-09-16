@@ -229,6 +229,10 @@ class Line:
 
         max_length = max([a_length, b_length])
 
+        if max_length <= 0 :
+            return 100
+        pass
+
         diff_len_ratio = abs(a_length - b_length) / max_length
 
         dist_a = min( line_a.a.distance(line_b.a), line_a.a.distance(line_b.b))
