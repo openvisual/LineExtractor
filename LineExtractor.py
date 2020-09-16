@@ -164,7 +164,8 @@ class LineExtractor ( Common ):
                 algorithm = "multi_otsu"
             pass
 
-            thresh = 3
+            thresh = 15
+            thresh = 10
             bin_image = curr_image.threshold(algorithm=algorithm, bsize=21, c=1, thresh=thresh)
 
             curr_image = bin_image
@@ -217,8 +218,8 @@ class LineExtractor ( Common ):
             hough = curr_image.plot_lines( lineList )
             hough.save_img_as_file(img_path, hough.algorithm)
 
-            error_deg = 2
-            snap_dist = int( curr_image.diagonal() / 150)
+            error_deg = 4
+            snap_dist = int( curr_image.diagonal() / 130)
 
             lineList = lineList.merge_lines(error_deg=error_deg, snap_dist=snap_dist)
 
