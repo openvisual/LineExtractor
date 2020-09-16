@@ -136,7 +136,7 @@ class LineList( list ) :
                     merge_line = None
 
                     if i is not j:
-                        merge_line = lines[i].merge(lines[j], error_deg=error_deg, snap_dist=snap_dist)
+                        merge_line = lines[i].merge(lines[j])
                     pass
 
                     if merge_line is not None:

@@ -117,13 +117,8 @@ class Line:
         pass
     pass # -- is_mergeable
 
-    def merge(self, line_b, error_deg=1, snap_dist=5):
-        merge_line = None
+    def merge(self, line_b ):
         debug = 0
-
-        if not self.is_mergeable(line_b , error_deg=error_deg, snap_dist=snap_dist) :
-            return merge_line
-        pass
 
         la = self
         lb = line_b

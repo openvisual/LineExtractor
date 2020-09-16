@@ -528,7 +528,7 @@ class Image (Common) :
 
         contours = []
 
-        if cv.__version__ in [ "4.4.0" ] :
+        if cv.__version__.startswith("4." ) :
             ( contours_cv, _ ) = cv2.findContours(edged, mode, method)
             contours = contours_cv
         else :
