@@ -102,18 +102,60 @@ class LineList( list ) :
 
         merge_lines = []
         for lineGrp in lineGroups :
-            merge_lines.append( LineList.merge_into_single_line( lineGrp ) )
+            #merge_lines.append( LineList.merge_into_single_line( lineGrp ) )
+            merge_lines.extend(LineList.merge_into_single_line(lineGrp))
         pass
 
         merge_lines = sorted(merge_lines, key=cmp_to_key(Line.compare_line_length))
         merge_lines = merge_lines[:: -1]
 
         lineList = LineList(lines=merge_lines, algorithm=self.algorithm, w=self.w, h=self.h, fileBase=self.fileBase, mode=self.mode)
-        lineList.algorithm = f"{self.algorithm} merge(error_deg={error_deg}, snap={snap_dist})"
+        lineList.algorithm = f"line merge(error_deg={error_deg}, snap={snap_dist})"
 
         return lineList
 
     pass  # -- merge_lines
+
+    @staticmethod
+    def merge_into_single_line(lines, error_deg=1, snap_dist=5):
+        debug = False
+        lines = lines.copy()
+
+        line_merged = True
+
+        while line_merged:
+            line_merged = False
+
+            i = 0
+            lines = sorted(lines, key=cmp_to_key(Line.compare_line_slope))
+
+            while i < (len(lines) - 1):
+                j = 0
+                while i < (len(lines) - 1) and j < len(lines):
+                    merge_line = None
+
+                    if i is not j:
+                        merge_line = lines[i].merge(lines[j], error_deg=error_deg, snap_dist=snap_dist)
+                    pass
+
+                    if merge_line is not None:
+                        line_merged = True
+                        lines[i] = merge_line
+                        lines.pop(j)
+
+                        debug and log.info(f"Line({i}, {j}) are merged.")
+                    else:
+                        j += 1
+                    pass
+                pass
+
+                i += 1
+            pass
+        pass
+
+        return lines
+
+    pass  # -- merge_into_single_line
 
     @staticmethod
     def merge_into_single_line_failed( lines ):
@@ -240,53 +282,5 @@ class LineList( list ) :
         return line
 
     pass # -- merge_into_single_line_old
-
-    @staticmethod
-    def merge_into_single_line( lines, error_deg=1, snap_dist=5):
-        debug = False
-        lines = lines.copy()
-
-        line_merged = True
-
-        while line_merged:
-            line_merged = False
-
-            i = 0
-            lines = sorted(lines, key=cmp_to_key(Line.compare_line_slope))
-
-            while i < (len(lines) - 1):
-                j = 0
-                while i < (len(lines) - 1) and j < len(lines):
-                    merge_line = None
-
-                    if i is not j:
-                        merge_line = lines[i].merge(lines[j], error_deg=error_deg, snap_dist=snap_dist)
-                    pass
-
-                    if merge_line is not None:
-                        line_merged = True
-                        lines[i] = merge_line
-                        lines.pop(j)
-
-                        debug and log.info(f"Line({i}, {j}) are merged.")
-                    else:
-                        j += 1
-                    pass
-                pass
-
-                i += 1
-            pass
-        pass
-
-        lines = sorted(lines, key=cmp_to_key(Line.compare_line_length))
-        lines = lines[:: -1]
-
-        lineList = LineList(lines=lines, algorithm=self.algorithm, w=self.w, h=self.h, fileBase=self.fileBase,
-                            mode=self.mode)
-        lineList.algorithm = f"{self.algorithm} merge(error_deg={error_deg}, snap={snap_dist})"
-
-        return lineList
-
-    pass  # -- merge_lines old
 
 pass # -- LineList
