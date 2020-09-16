@@ -141,18 +141,18 @@ class Line:
 
         d_theta = abs( theta_a - theta_b ) % (2*math.pi)
 
-        theta_r = theta_a
+        theta = theta_a
 
         if d_theta <= pi/2 :
-            theta_r = (la_len*theta_a + lb_len*theta_b)/len_sum
+            theta = (la_len*theta_a + lb_len*theta_b)/len_sum
         else :
-            theta_r = (la_len*theta_a + lb_len*(theta_b - pi))/len_sum
+            theta = (la_len*theta_a + lb_len*(theta_b - pi))/len_sum
         pass
 
         points_merge = [ None ]*len( points )
         if True :
-            rotate_vec = np.array([cos(theta_r), sin(theta_r)])
-            un_rot_matrix = np.array([[cos(- theta_r), sin(- theta_r)], [-sin(- theta_r), cos(- theta_r)]])
+            rotate_vec = np.array([cos(theta), sin(theta)])
+            un_rot_matrix = np.array([[cos(- theta), sin(- theta)], [-sin(- theta), cos(- theta)]])
 
             for i, p in enumerate( points ) :
                 p = np.array([p.x - xg, p.y - yg])
