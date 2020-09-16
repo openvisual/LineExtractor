@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 # Let's load a simple image with 3 black squares
 img_path = "./data_yegan/set_01/_1018843.JPG"
+#img_path = "./data/157.png"
 grayscale = cv2.imread( img_path, 0 )
 
 img = grayscale

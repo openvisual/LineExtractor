@@ -11,9 +11,13 @@ class Line:
 
     ID = 0
 
-    def __init__(self, a=None, b=None, line=None, fileBase="" ):
-        self.id = Line.ID
-        Line.ID += 1
+    def __init__(self, a=None, b=None, line=None, fileBase="", id = None ):
+        if id is None :
+            id = Line.ID
+            Line.ID += 1
+        pass
+
+        self.id = id
 
         if line is not None :
             a = Point(line[0], line[1])
@@ -21,7 +25,7 @@ class Line:
         pass
 
         self.a = a if a.x < b.x else b
-        self.b = a if a.x > b.x else b
+        self.b = b if b.x >= a.x else a
 
         self.fileBase = fileBase
         self.line_identified = None
@@ -78,7 +82,7 @@ class Line:
 
     def slope_radian(self):
         rad = math.atan2( self.dy() , self.dx() )
-        rad = rad % (2*math.pi)
+        #rad = rad % (2*math.pi)
 
         return rad
     pass

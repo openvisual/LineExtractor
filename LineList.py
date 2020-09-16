@@ -4,7 +4,10 @@ import logging as log
 log.basicConfig( format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)04d] %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=log.INFO )
 
 import math
+from math import sin, cos
+
 from functools import cmp_to_key
+import numpy as np
 
 from Line import *
 from Common import profile
@@ -113,45 +116,135 @@ class LineList( list ) :
     pass  # -- merge_lines
 
     @staticmethod
-    def merge_into_single_line( lines ):
+    def merge_into_single_line_failed( lines ):
+        len_sum = 0
+
+        lines = lines.copy()
+
+        length_sum = 0
+        slope_rad = 0
+
+        if True :
+            slope_rad_length_sum = 0
+
+            slope_rad_ref = lines[0].slope_radian()
+
+            for line in lines:
+                slope_rad_length_sum += ( slope_rad_ref - line.slope_radian() )
+                length_sum += line.length()
+            pass
+
+            slope_rad = slope_rad_ref + ( slope_rad_length_sum / len( lines ) )
+        pass
+
+        xg = 0
+        yg = 0
+
+        for line in lines :
+            length = line.length()
+
+            xg += length * ( line.a.x + line.b.x )
+            yg += length * ( line.a.y + line.b.y )
+        pass
+
+        xg = xg / length_sum / len(lines)
+        yg = yg / length_sum / len(lines)
+
+        theta = slope_rad
+
+        lines_rotated = [None] * len(lines)
+
+        if True :
+            rotate_project = np.array([cos(theta), sin(theta)] )
+            r = rotate_project
+
+            for i in range( len( lines_rotated ) ) :
+                line = lines[ i ]
+
+                p = line.a
+                p = np.array([p.x - xg, p.y - yg])
+                x = np.dot(r, p)
+                y = 0
+                a = Point(x, y)
+
+                p = line.b
+                p = np.array([p.x - xg, p.y - yg])
+                x = np.dot(r, p)
+                y = 0
+                b = Point(x, y)
+
+                lines_rotated[i] = Line( a=a, b=b, id=line.id )
+            pass
+        pass
+
+        min_a = lines_rotated[0].a
+        max_b = lines_rotated[0].b
+
+        for line in lines_rotated :
+            if line.a.x < min_a.x :
+                min_a = line.a
+            pass
+
+            if line.b.x > max_b.x :
+                max_b = line.b
+            pass
+        pass
+
+        rotate_matrix = np.array([[cos( - theta), sin( - theta)], [-sin( - theta), cos( - theta)]])
+        r = rotate_matrix
+
+        p = np.matmul(r, [min_a.x, min_a.y])
+        a = Point( int( xg + p[0] ), int( yg + p[1] ) )
+
+        p = np.matmul(r, [max_b.x, max_b.y])
+        b = Point( int( xg + p[0] ), int( yg + p[1] ) )
+
+        merge_line = Line( a = a, b = b )
+
+        return merge_line
+    pass # -- merge_into_single_line
+
+    @staticmethod
+    def merge_into_single_line_old(lines):
         debug = False
 
         slope_rad_length_sum = 0
         length_sum = 0
 
-        for line in lines :
+        for line in lines:
             slope_rad_length_sum += line.slope_radian()
             length_sum += line.length()
         pass
 
-        slope_rad = slope_rad_length_sum/length_sum
-        slope_rad = slope_rad % (2*math.pi)
+        slope_rad = slope_rad_length_sum / length_sum
+        slope_rad = slope_rad % (2 * math.pi)
 
         line = lines[0]
         min_a = line.a if line.a.x < line.b.x else line.b
         max_b = line.b if line.b.x > line.a.x else line.a
 
-        for line in lines :
-            points = [ line.a, line.b ]
+        for line in lines:
+            points = [line.a, line.b]
 
-            for p in points :
-                if p.x < min_a.x :
+            for p in points:
+                if p.x < min_a.x:
                     min_a = p
-                elif p.x > max_b.x :
+                elif p.x > max_b.x:
                     max_b = p
                 pass
             pass
         pass
 
-        line = Line( a = min_a, b = max_b )
+        line = Line(a=min_a, b=max_b)
 
         return line
-    pass
 
-    @profile
-    def merge_lines_old(self, error_deg=1, snap_dist=5):
+    pass # -- merge_into_single_line_old
+
+    @staticmethod
+    def merge_into_single_line( lines, error_deg=1, snap_dist=5):
         debug = False
-        lines = self.copy()
+        lines = lines.copy()
 
         line_merged = True
 
