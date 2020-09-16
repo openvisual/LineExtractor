@@ -6,6 +6,8 @@ log.basicConfig( format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)04d]
 from functools import cmp_to_key
 
 from Point import *
+from math import pi, cos, sin
+import numpy as np
 
 class Line:
 
@@ -115,7 +117,70 @@ class Line:
         pass
     pass # -- is_mergeable
 
-    def merge(self, line, error_deg=1, snap_dist=5 ):
+    def merge(self, line_b, error_deg=1, snap_dist=5):
+        merge_line = None
+        debug = 0
+
+        if not self.is_mergeable(line_b , error_deg=error_deg, snap_dist=snap_dist) :
+            return merge_line
+        pass
+
+        la = self
+        lb = line_b
+        points = [ la.a, la.b, lb.a, lb.b]
+
+        la_len = la.length()
+        lb_len = lb.length()
+        len_sum = la_len + lb_len
+
+        xg = (la_len * (la.a.x + la.b.x) + lb_len * (lb.a.x + lb.b.x)) / (2 * len_sum)
+        yg = (la_len * (la.a.y + la.b.y) + lb_len * (lb.a.y + lb.b.y)) / (2 * len_sum)
+
+        theta_a = la.slope_radian()
+        theta_b = lb.slope_radian()
+
+        d_theta = abs( theta_a - theta_b ) % (2*math.pi)
+
+        theta_r = theta_a
+
+        if d_theta <= pi/2 :
+            theta_r = (la_len*theta_a + lb_len*theta_b)/len_sum
+        else :
+            theta_r = (la_len*theta_a + lb_len*(theta_b - pi))/len_sum
+        pass
+
+        points_merge = [ None ]*len( points )
+        if True :
+            rotate_vec = np.array([cos(theta_r), sin(theta_r)])
+            un_rot_matrix = np.array([[cos(- theta_r), sin(- theta_r)], [-sin(- theta_r), cos(- theta_r)]])
+
+            for i, p in enumerate( points ) :
+                p = np.array([p.x - xg, p.y - yg])
+                x = np.dot( rotate_vec, p)
+                y = 0
+
+                q = np.matmul(un_rot_matrix, [x, y])
+
+                a = Point(int(xg + q[0]), int(yg + q[1]))
+
+                points_merge[i] = a
+            pass
+        pass
+
+        debug and log.info( f"points org = { ', '.join([str(p) for p in points]) }")
+
+        points_merge = sorted(points_merge, key=cmp_to_key(Point.compare_point_x))
+
+        debug and log.info( f"points sort = { ', '.join([str(p) for p in points_merge]) }")
+
+        merge_line = Line( a = points_merge[0], b = points_merge[-1], fileBase=la.fileBase )
+
+        debug and log.info( f"merge line = {merge_line}")
+
+        return merge_line
+    pass # -- merge
+
+    def merge_old(self, line, error_deg=1, snap_dist=5 ):
         merge_line = None
         debug = 0
 

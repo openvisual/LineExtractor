@@ -246,41 +246,4 @@ class LineList( list ) :
         return merge_line
     pass # -- merge_into_single_line
 
-    @staticmethod
-    def merge_into_single_line_old(lines):
-        debug = False
-
-        slope_rad_length_sum = 0
-        length_sum = 0
-
-        for line in lines:
-            slope_rad_length_sum += line.slope_radian()
-            length_sum += line.length()
-        pass
-
-        slope_rad = slope_rad_length_sum / length_sum
-        slope_rad = slope_rad % (2 * math.pi)
-
-        line = lines[0]
-        min_a = line.a if line.a.x < line.b.x else line.b
-        max_b = line.b if line.b.x > line.a.x else line.a
-
-        for line in lines:
-            points = [line.a, line.b]
-
-            for p in points:
-                if p.x < min_a.x:
-                    min_a = p
-                elif p.x > max_b.x:
-                    max_b = p
-                pass
-            pass
-        pass
-
-        line = Line(a=min_a, b=max_b)
-
-        return line
-
-    pass # -- merge_into_single_line_old
-
 pass # -- LineList
