@@ -187,7 +187,7 @@ class LineExtractor ( Common ):
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
         pass  # -- morphology
 
-        useCanny = True
+        useCanny = False
         if useCanny:
             canny = curr_image.canny(min=0, max=255)
 
@@ -198,7 +198,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- canny
 
-        useContour = useCanny
+        useContour = False
         if useContour: # TODO Contour
             contour = curr_image.contours(lineWidth=2, useFilter=True)
 

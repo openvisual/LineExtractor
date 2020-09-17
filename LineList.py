@@ -94,7 +94,7 @@ class LineList( list ) :
         lineGroups = []
 
         for line in lines :
-            line_found, _, lineGrp_found = line.get_most_mergable_line_from_linegrps( lineGroups, error_deg=error_deg, snap_dist=snap_dist )
+            line_found, _, lineGrp_found = line.get_most_mergeable_line_from_linegrps( lineGroups, error_deg=error_deg, snap_dist=snap_dist )
             if line_found is not None :
                 lineGrp_found.append( line )
             else :
@@ -104,7 +104,8 @@ class LineList( list ) :
 
         merge_lines = []
         for lineGrp in lineGroups :
-            merge_lines.extend(LineList.merge_into_single_lines(lineGrp))
+            merge_lines.append(LineList.merge_into_single_line(lineGrp))
+            #merge_lines.extend(LineList.merge_into_single_lines(lineGrp))
         pass
 
         merge_lines = sorted(merge_lines, key=cmp_to_key(Line.compare_line_length))
@@ -118,43 +119,24 @@ class LineList( list ) :
     pass  # -- merge_lines
 
     @staticmethod
-    def merge_into_single_lines(lines, error_deg=1, snap_dist=5):
+    def merge_into_single_line(lines, error_deg=1, snap_dist=5):
         debug = False
         lines = lines.copy()
 
-        line_merged = True
+        lines = sorted(lines, key=cmp_to_key(Line.compare_line_length))
+        lines = lines[ :: -1 ]
 
-        while line_merged:
-            line_merged = False
+        line = lines.pop(0)
 
-            i = 0
-            lines = sorted(lines, key=cmp_to_key(Line.compare_line_slope))
+        while len( lines ) > 0 :
+            most_near_line, _ = line.get_most_mergeable_line_from_lines( lines )
 
-            while i < (len(lines) - 1):
-                j = 0
-                while i < (len(lines) - 1) and j < len(lines):
-                    merge_line = None
+            lines.remove( most_near_line )
 
-                    if i is not j:
-                        merge_line = lines[i].merge(lines[j])
-                    pass
-
-                    if merge_line is not None:
-                        line_merged = True
-                        lines[i] = merge_line
-                        lines.pop(j)
-
-                        debug and log.info(f"Line({i}, {j}) are merged.")
-                    else:
-                        j += 1
-                    pass
-                pass
-
-                i += 1
-            pass
+            line = line.merge( most_near_line )
         pass
 
-        return lines
+        return line
 
     pass  # -- merge_into_single_line
 
