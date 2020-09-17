@@ -89,7 +89,7 @@ class LineList( list ) :
 
         lines = self
 
-        lines = list(filter(lambda x: x.length() > 2, lines))
+        lines = list(filter(lambda x: x.length() != 0 , lines))
 
         lineGroups = []
 
