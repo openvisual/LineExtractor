@@ -234,7 +234,9 @@ class LineExtractor ( Common ):
 
             min_length = int( max( [curr_image.width(), curr_image.height()] ) * 0.1 )
 
-            lineListIdentified = lineListA.line_identify( lineList, min_length = min_length )
+            similarity_min = 0.7
+
+            lineListIdentified = lineListA.line_identify( lineList, min_length = min_length, similarity_min = similarity_min  )
 
             identify = curr_image.plot_lines( lineListIdentified )
             identify.save_img_as_file(img_path, f"identify(min_length={min_length}")
@@ -264,7 +266,8 @@ if __name__ == '__main__':
 
     img_path = ""
 
-    use_one_file = False
+    use_one_file = True
+
     if use_one_file :
         img_path = "./data_yegan/set_01/_1018843.JPG"
         #img_path = "./data_yegan/set_01/_1018885.JPG"

@@ -28,7 +28,9 @@ class LineList( list ) :
         self.lineListIdentified = None
     pass # -- __init__
 
-    def line_identify(self, lineList_b, min_length = 1 ):
+    def line_identify(self, lineList_b, min_length = 1, similarity_min = 0 ):
+        debug = False
+
         fileBase = self.fileBase
 
         w = self.w
@@ -37,24 +39,36 @@ class LineList( list ) :
 
         lineList_b = lineList_b.copy()
 
-        lines_identified = []
+        line_matches = []
 
         for line in self  :
             if line.length() > min_length :
-                line_identified = line.get_identified_line(lineList_b)
-                if line_identified is not None :
-                    if line_identified.length() > min_length :
-                        line.line_identified = line_identified
+                line_matched = line.get_match_line(lineList_b)
+                if line_matched is not None :
+                    if line_matched.length() > min_length :
+                        line.line_matched = line_matched
 
-                        lines_identified.append( line )
+                        line_matches.append( line )
                     pass
 
-                    lineList_b.remove( line_identified )
+                    lineList_b.remove( line_matched )
                 pass
             pass
         pass
 
-        lineList = LineList( lines = lines_identified, algorithm=algorithm, w=w, h=h, fileBase=fileBase)
+        line_matches = sorted(line_matches, key=cmp_to_key(Line.compare_line_similarity))
+
+        line_matches = [s for s in line_matches if s.similarity > similarity_min ]
+
+        line_matches = line_matches[ :: -1 ]
+
+        if debug :
+            for i, line in enumerate( line_matches ) :
+                log.info( f"[{i:03d}] similarity={line.similarity:0.4f} ")
+            pass
+        pass
+
+        lineList = LineList( lines = line_matches, algorithm=algorithm, w=w, h=h, fileBase=fileBase)
 
         return lineList
     pass # -- identify
@@ -76,7 +90,7 @@ class LineList( list ) :
 
             debug and log.info( f"id={line.id} , fileBase={fileBase}" )
 
-            line = lineA.line_identified
+            line = lineA.line_matched
             fileBase = line.fileBase
 
             line_data[ fileBase] = {"point1": [int(line.a.x), int(line.a.y)], "point2": [int(line.b.x), int(line.b.y)]}

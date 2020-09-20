@@ -30,7 +30,7 @@ class Line:
         self.b = b if b.x >= a.x else a
 
         self.fileBase = fileBase
-        self.line_identified = None
+        self.line_matched = None
         self.similarity = None
     pass
 
@@ -192,6 +192,19 @@ class Line:
         return a.slope_radian() - b.slope_radian()
     pass
 
+    @staticmethod
+    def compare_line_similarity(a, b):
+        comp = a.similarity - b.similarity
+
+        if comp == 0 :
+            return 0
+        elif comp > 0 :
+            return 1
+        else :
+            return -1
+        pass
+    pass # -- compare_line_similarity
+
     def get_similarity(self, line_b):
         line_a = self
 
@@ -217,18 +230,19 @@ class Line:
         dist_ratio = dist / max_length
 
         similarity = (diff_rad_ratio + diff_len_ratio + dist_ratio)/3
+        similarity = 1.0 - similarity
 
         return similarity
     pass # -- get_similarity
 
     def get_most_mergeable_line_from_lines(self, lineList, error_deg= None, snap_dist= None ):
         line_found = None
-        similarity_min = 100_000
+        similarity_min = 0
 
         for line in lineList :
             if ( error_deg is None or snap_dist is None ) or self.is_mergeable( line, error_deg=error_deg, snap_dist=snap_dist) :
                 similarity = self.get_similarity(line)
-                if similarity < similarity_min:
+                if similarity >= similarity_min:
                     line_found = line
                     similarity_min = similarity
                 pass
@@ -242,11 +256,11 @@ class Line:
     def get_most_mergeable_line_from_linegrps(self, lineGrpList , error_deg=1, snap_dist=5 ):
         lineGrp_found = None
         line_found = None
-        similarity_min = 100_000
+        similarity_min = 0
 
         for lineGrp in lineGrpList:
             line, similarity = self.get_most_mergeable_line_from_lines( lineGrp, error_deg=error_deg, snap_dist=snap_dist )
-            if similarity < similarity_min:
+            if similarity >= similarity_min:
                 lineGrp_found = lineGrp
                 line_found = line
                 similarity_min = similarity
@@ -257,21 +271,23 @@ class Line:
 
     pass  # --get_most_similar_line_from_linegrp_list
 
-    def get_identified_line(self, lineList ):
+    def get_match_line(self, lineList):
 
-        line_found = None
-        similarity_min = 100_000
+        line_match = None
+        similarity_min = 0
 
         for line_b in lineList:
             similarity = self.get_similarity( line_b )
-            if similarity < similarity_min :
+            if similarity >= similarity_min :
                 similarity_min = similarity
-                line_found = line_b
-                line_found.similarity = similarity_min
+                line_match = line_b
+                line_match.similarity = similarity_min
+
+                self.similarity = similarity
             pass
         pass
 
-        return line_found
+        return line_match
 
     pass  # -- get_identified_line
 
