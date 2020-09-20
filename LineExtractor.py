@@ -199,7 +199,7 @@ class LineExtractor ( Common ):
         pass  # -- canny
 
         useContour = True
-        if useContour: # TODO Contour
+        if useContour:
             contour = curr_image.contours(lineWidth=2, useFilter=True)
 
             curr_image = contour
@@ -278,33 +278,33 @@ if __name__ == '__main__':
 
     log.info( f"file count={ len(files )}" )
 
-    lineListAll = LineList()
+    lineListMatched = LineList()
 
     for i in range( 0 , len(files), 2 ) :
         file = files[i]
 
         img_path = file.replace( "\\", "/" )
 
-        lineList = lineExtractor.my_line_extract( img_path=img_path, qtUi=None )
+        lineListA = lineExtractor.my_line_extract( img_path=img_path, qtUi=None )
 
         nextFile = lineExtractor.next_file( img_path )
 
-        if nextFile and nextFile is not None :
-            lineList = lineExtractor.my_line_extract( img_path=nextFile, qtUi=None, lineListA=lineList )
+        if nextFile is not None :
+            lineListB = lineExtractor.my_line_extract( img_path=nextFile, qtUi=None, lineListA=lineListA )
 
-            lineListAll.extend( lineList.lineListIdentified )
+            lineListMatched.extend(lineListB.lineListIdentified)
         pass
     pass
 
-    if lineListAll :
+    if lineListMatched :
         fileBase = os.path.basename(img_path)
         fileHeader, ext = os.path.splitext(fileBase)
         now = datetime.datetime.now()
         now_str = now.strftime('%m-%d_%H%M%S')
         now_str = now_str.split(".")[0]
-        json_file_name = os.path.join("/temp", f"{fileHeader}_{now_str}.json")
+        json_file_name = os.path.join( "C:/temp", f"{fileHeader}_{now_str}.json")
 
-        lineListAll.save_as_json(json_file_name=json_file_name)
+        lineListMatched.save_as_json(json_file_name=json_file_name)
     pass
 
     lineExtractor.print_profile()
