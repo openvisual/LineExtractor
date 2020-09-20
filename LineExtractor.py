@@ -264,13 +264,12 @@ if __name__ == '__main__':
 
     img_path = ""
 
-    if 1 :
+    use_one_file = False
+    if use_one_file :
         img_path = "./data_yegan/set_01/_1018843.JPG"
         #img_path = "./data_yegan/set_01/_1018885.JPG"
-    pass
 
-    if img_path :
-        files.append( img_path )
+        files.append(img_path)
     else :
         folder = "./data_yegan/set_01"
         for ext in ('*.gif', '*.png', '*.jpg'):
@@ -282,10 +281,17 @@ if __name__ == '__main__':
 
     lineListMatched = LineList()
 
-    for i in range( 0 , len(files), 2 ) :
+    len_files = len( files )
+    for i in range( 0 , len_files, 2 ) :
         file = files[i]
 
         img_path = file.replace( "\\", "/" )
+
+        log.info( "" )
+        log.info( "*"*80 )
+        log.info( f"[{i:04d}] [{100*i/len_files:.1f} %] {img_path}" )
+        log.info("*" * 80)
+        log.info("")
 
         lineListA = lineExtractor.my_line_extract( img_path=img_path, qtUi=None )
 
