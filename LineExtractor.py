@@ -216,7 +216,7 @@ class LineExtractor ( Common ):
             hough = curr_image.plot_lines( lineList )
             hough.save_img_as_file(img_path, hough.algorithm)
 
-            error_deg = 2
+            error_deg = 3
             snap_dist = 15
 
             lineList = lineList.merge_lines(error_deg=error_deg, snap_dist=snap_dist)
@@ -232,10 +232,12 @@ class LineExtractor ( Common ):
         if lineList is not None and lineListA is not None :
             log.info( "Line tagging....")
 
-            lineListIdentified = lineListA.line_identify( lineList )
+            min_length = int( max( [curr_image.width(), curr_image.height()] ) * 0.1 )
+
+            lineListIdentified = lineListA.line_identify( lineList, min_length = min_length )
 
             identify = curr_image.plot_lines( lineListIdentified )
-            identify.save_img_as_file(img_path, "identify")
+            identify.save_img_as_file(img_path, f"identify(min_length={min_length}")
             identify.plot_image(title="identify", border_color="blue", qtUi=qtUi, mode=mode)
 
             lineList.lineListIdentified = lineListIdentified

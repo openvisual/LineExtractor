@@ -28,21 +28,29 @@ class LineList( list ) :
         self.lineListIdentified = None
     pass # -- __init__
 
-    def line_identify(self, lineList_b):
+    def line_identify(self, lineList_b, min_length = 1 ):
         fileBase = self.fileBase
 
         w = self.w
         h = self.h
         algorithm = self.algorithm
 
+        lineList_b = lineList_b.copy()
+
         lines_identified = []
 
         for line in self  :
-            line_identified = line.get_identified_line(lineList_b)
-            if line_identified is not None :
-                line.line_identified = line_identified
+            if line.length() > min_length :
+                line_identified = line.get_identified_line(lineList_b)
+                if line_identified is not None :
+                    if line_identified.length() > min_length :
+                        line.line_identified = line_identified
 
-                lines_identified.append( line )
+                        lines_identified.append( line )
+                    pass
+
+                    lineList_b.remove( line_identified )
+                pass
             pass
         pass
 
