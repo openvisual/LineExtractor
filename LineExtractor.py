@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
     img_path = ""
 
-    use_one_file = True
+    use_one_file = False
 
     if use_one_file :
         img_path = "./data_yegan/set_01/_1018843.JPG"
