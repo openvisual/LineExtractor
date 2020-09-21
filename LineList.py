@@ -73,28 +73,33 @@ class LineList( list ) :
         return lineList
     pass # -- identify
 
-    def save_as_json(self, json_file_name ):
+    def save_as_json(self, json_file_name, width, height ):
         debug = False
         import json
         #data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
         data = {}
+
+        def conv_coord( point, w, h) :
+            x = int( point.x - w // 2 )
+            y = int( h // 2 - point.y )
+
+            return [ x, y ]
+        pass
+
+        w = width
+        h = height
 
         lines = self
 
         for i, lineA in enumerate( lines ) :
             line_data = {}
 
-            line = lineA
-            fileBase = line.fileBase
-            line_data[ fileBase ] = {"point1": [int(line.a.x), int(line.a.y)], "point2": [int(line.b.x), int(line.b.y)]}
+            for line in [ lineA, lineA.line_matched ] :
+                fileBase = line.fileBase
+                line_data[ fileBase ] = {"point1": conv_coord( line.a, w, h ), "point2": conv_coord( line.b, w, h ) }
 
-            debug and log.info( f"id={line.id} , fileBase={fileBase}" )
-
-            line = lineA.line_matched
-            fileBase = line.fileBase
-
-            line_data[ fileBase] = {"point1": [int(line.a.x), int(line.a.y)], "point2": [int(line.b.x), int(line.b.y)]}
-            debug and log.info(f"id={line.id} , fileBase={fileBase}")
+                debug and log.info( f"id={line.id} , fileBase={fileBase}" )
+            pass
 
             data[ f"line{i +1}" ] = line_data
         pass

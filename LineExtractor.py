@@ -17,6 +17,9 @@ class LineExtractor ( Common ):
 
     def __init__(self):
         Common.__init__( self )
+
+        self.width = None
+        self.height = None
     pass
 
     @profile
@@ -76,6 +79,9 @@ class LineExtractor ( Common ):
         height = img_org.shape[0]
         width = img_org.shape[1]
         channel_cnt = img_org.shape[2]
+
+        self.width = width
+        self.height = height
 
         log.info(f"Image width: {width}, height: {height}, channel: {channel_cnt}")
 
@@ -266,7 +272,7 @@ if __name__ == '__main__':
 
     img_path = ""
 
-    use_one_file = False
+    use_one_file = True
 
     if use_one_file :
         img_path = "./data_yegan/set_01/_1018843.JPG"
@@ -315,7 +321,10 @@ if __name__ == '__main__':
         now_str = now_str.split(".")[0]
         json_file_name = os.path.join( "C:/temp", f"{fileHeader}_{now_str}.json")
 
-        lineListMatched.save_as_json(json_file_name=json_file_name)
+        width = lineExtractor.width
+        height = lineExtractor.height
+
+        lineListMatched.save_as_json(json_file_name=json_file_name, width=width, height=height )
     pass
 
     lineExtractor.print_profile()
