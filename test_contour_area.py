@@ -17,19 +17,41 @@ for i, cnt in enumerate( contours ):
     M = cv.moments(cnt)
     0 and log.info( f"Moments = {M}" )
 
+    # area and perimeter
     area = cv.contourArea(cnt)
     perimeter = cv.arcLength(cnt, True)
 
     log.info( f"[{(i+1):03d}] area = {area}, perimeter = {perimeter}")
 
+    # Straight Bounding Rectangle
     x, y, w, h = cv.boundingRect(cnt)
     cv.rectangle( img, (x, y), (x + w, y + h), (0, 255, 0), 2)
     log.info( f"x = {x}, y = {y}, w = {w}, h = {h}")
 
+    # Rotated Rectangle
     rect = cv.minAreaRect(cnt)
     box = cv.boxPoints(rect)
     box = np.int0(box)
     cv.drawContours(img, [box], 0, (0, 0, 255), 2)
+
+    # minimum enclosing circle
+    (x, y), radius = cv.minEnclosingCircle(cnt)
+    center = (int(x), int(y))
+    radius = int(radius)
+    cv.circle(img, center, radius, (255, 0, 0), 2)
+
+    # Fitting an Ellipse
+    ellipse = cv.fitEllipse(cnt)
+    cv.ellipse(img, ellipse, (0, 255, 255), 2)
+
+    # Fitting a Line
+    height, width = img.shape[:2]
+    # -- (x,y) = (x0,y0) + t*(vx,vy)
+    [vx, vy, x, y] = cv.fitLine(cnt, cv.DIST_L2, 0, 0.01, 0.01)
+    lefty = int((-x * vy / vx) + y)
+    righty = int(((width - x) * vy / vx) + y)
+    #cv.line(img, ( int( x ), int( y ) ), ( int( vx ), int( vy ) ), (255, 255, 0), 2)
+    cv.line(img, (width - 1, righty), (0, lefty), (255, 255, 0), 2)
 pass
 
 plt.imshow( img )
