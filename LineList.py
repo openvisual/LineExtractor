@@ -28,51 +28,78 @@ class LineList( list ) :
         self.lineListIdentified = None
     pass # -- __init__
 
-    def line_identify(self, lineList_b):
+    def line_identify(self, lineList_b, min_length = 1, similarity_min = 0 ):
+        debug = False
+
         fileBase = self.fileBase
 
         w = self.w
         h = self.h
         algorithm = self.algorithm
 
-        lines_identified = []
+        lineList_b = lineList_b.copy()
+
+        line_matches = []
 
         for line in self  :
-            line_identified = line.get_identified_line(lineList_b)
-            if line_identified is not None :
-                line.line_identified = line_identified
+            if line.length() > min_length :
+                line_matched = line.get_match_line(lineList_b)
+                if line_matched is not None :
+                    if line_matched.length() > min_length :
+                        line.line_matched = line_matched
 
-                lines_identified.append( line )
+                        line_matches.append( line )
+                    pass
+
+                    lineList_b.remove( line_matched )
+                pass
             pass
         pass
 
-        lineList = LineList( lines = lines_identified, algorithm=algorithm, w=w, h=h, fileBase=fileBase)
+        line_matches = sorted(line_matches, key=cmp_to_key(Line.compare_line_similarity))
+
+        line_matches = [s for s in line_matches if s.similarity > similarity_min ]
+
+        line_matches = line_matches[ :: -1 ]
+
+        if debug :
+            for i, line in enumerate( line_matches ) :
+                log.info( f"[{i:03d}] similarity={line.similarity:0.4f} ")
+            pass
+        pass
+
+        lineList = LineList( lines = line_matches, algorithm=algorithm, w=w, h=h, fileBase=fileBase)
 
         return lineList
     pass # -- identify
 
-    def save_as_json(self, json_file_name ):
+    def save_as_json(self, json_file_name, width, height ):
         debug = False
         import json
         #data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
         data = {}
+
+        def conv_coord( point, w, h) :
+            x = int( point.x - w // 2 )
+            y = int( h // 2 - point.y )
+
+            return [ x, y ]
+        pass
+
+        w = width
+        h = height
 
         lines = self
 
         for i, lineA in enumerate( lines ) :
             line_data = {}
 
-            line = lineA
-            fileBase = line.fileBase
-            line_data[ fileBase ] = {"point1": [int(line.a.x), int(line.a.y)], "point2": [int(line.b.x), int(line.b.y)]}
+            for line in [ lineA, lineA.line_matched ] :
+                fileBase = line.fileBase
+                line_data[ fileBase ] = {"point1": conv_coord( line.a, w, h ), "point2": conv_coord( line.b, w, h ) }
 
-            debug and log.info( f"id={line.id} , fileBase={fileBase}" )
-
-            line = lineA.line_identified
-            fileBase = line.fileBase
-
-            line_data[ fileBase] = {"point1": [int(line.a.x), int(line.a.y)], "point2": [int(line.b.x), int(line.b.y)]}
-            debug and log.info(f"id={line.id} , fileBase={fileBase}")
+                debug and log.info( f"id={line.id} , fileBase={fileBase}" )
+            pass
 
             data[ f"line{i +1}" ] = line_data
         pass
@@ -89,12 +116,12 @@ class LineList( list ) :
 
         lines = self
 
-        lines = list(filter(lambda x: x.length() > 10, lines))
+        lines = list(filter(lambda x: x.length() != 0 , lines))
 
         lineGroups = []
 
         for line in lines :
-            line_found, _, lineGrp_found = line.get_most_mergable_line_from_linegrps( lineGroups, error_deg=error_deg, snap_dist=snap_dist )
+            line_found, _, lineGrp_found = line.get_most_mergeable_line_from_linegrps( lineGroups, error_deg=error_deg, snap_dist=snap_dist )
             if line_found is not None :
                 lineGrp_found.append( line )
             else :
@@ -104,7 +131,8 @@ class LineList( list ) :
 
         merge_lines = []
         for lineGrp in lineGroups :
-            merge_lines.extend(LineList.merge_into_single_lines(lineGrp))
+            merge_lines.append(LineList.merge_into_single_line(lineGrp))
+            #merge_lines.extend(LineList.merge_into_single_lines(lineGrp))
         pass
 
         merge_lines = sorted(merge_lines, key=cmp_to_key(Line.compare_line_length))
@@ -118,43 +146,24 @@ class LineList( list ) :
     pass  # -- merge_lines
 
     @staticmethod
-    def merge_into_single_lines(lines, error_deg=1, snap_dist=5):
+    def merge_into_single_line(lines, error_deg=1, snap_dist=5):
         debug = False
         lines = lines.copy()
 
-        line_merged = True
+        lines = sorted(lines, key=cmp_to_key(Line.compare_line_length))
+        lines = lines[ :: -1 ]
 
-        while line_merged:
-            line_merged = False
+        line = lines.pop(0)
 
-            i = 0
-            lines = sorted(lines, key=cmp_to_key(Line.compare_line_slope))
+        while len( lines ) > 0 :
+            most_near_line, _ = line.get_most_mergeable_line_from_lines( lines )
 
-            while i < (len(lines) - 1):
-                j = 0
-                while i < (len(lines) - 1) and j < len(lines):
-                    merge_line = None
+            lines.remove( most_near_line )
 
-                    if i is not j:
-                        merge_line = lines[i].merge(lines[j], error_deg=error_deg, snap_dist=snap_dist)
-                    pass
-
-                    if merge_line is not None:
-                        line_merged = True
-                        lines[i] = merge_line
-                        lines.pop(j)
-
-                        debug and log.info(f"Line({i}, {j}) are merged.")
-                    else:
-                        j += 1
-                    pass
-                pass
-
-                i += 1
-            pass
+            line = line.merge( most_near_line )
         pass
 
-        return lines
+        return line
 
     pass  # -- merge_into_single_line
 

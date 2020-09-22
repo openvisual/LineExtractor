@@ -310,6 +310,7 @@ class Threshold(Common) :
         image = Image( data )
         image.threshold = f"bsize = {bsize}"
         image.algorithm = f"adaptive gaussian(bsize={bsize}, c={c})"
+        image.reverse_required = True
 
         return image
     pass  # -- threshold_adaptive_gaussian

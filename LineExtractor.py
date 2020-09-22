@@ -17,6 +17,9 @@ class LineExtractor ( Common ):
 
     def __init__(self):
         Common.__init__( self )
+
+        self.width = None
+        self.height = None
     pass
 
     @profile
@@ -76,6 +79,9 @@ class LineExtractor ( Common ):
         height = img_org.shape[0]
         width = img_org.shape[1]
         channel_cnt = img_org.shape[2]
+
+        self.width = width
+        self.height = height
 
         log.info(f"Image width: {width}, height: {height}, channel: {channel_cnt}")
 
@@ -164,9 +170,7 @@ class LineExtractor ( Common ):
                 algorithm = "multi_otsu"
             pass
 
-            thresh = 15
-            thresh = 10
-            bin_image = curr_image.threshold(algorithm=algorithm, bsize=21, c=1, thresh=thresh)
+            bin_image = curr_image.threshold(algorithm=algorithm, bsize=21, c=1, thresh=15)
 
             curr_image = bin_image
 
@@ -181,7 +185,7 @@ class LineExtractor ( Common ):
 
         use_morphology = False
         if use_morphology:  # TODO morphology
-            morphology = curr_image.morphology(is_open=1, bsize=3, iterations=20, kernel_type="cross")
+            morphology = curr_image.morphology(is_open=1, bsize=7, iterations=3, kernel_type="cross")
 
             curr_image = morphology
 
@@ -201,7 +205,7 @@ class LineExtractor ( Common ):
         pass  # -- canny
 
         useContour = True
-        if useContour: # TODO Contour
+        if useContour:
             contour = curr_image.contours(lineWidth=2, useFilter=True)
 
             curr_image = contour
@@ -218,8 +222,8 @@ class LineExtractor ( Common ):
             hough = curr_image.plot_lines( lineList )
             hough.save_img_as_file(img_path, hough.algorithm)
 
-            error_deg = 4
-            snap_dist = int( curr_image.diagonal() / 130)
+            error_deg = 3
+            snap_dist = 15
 
             lineList = lineList.merge_lines(error_deg=error_deg, snap_dist=snap_dist)
 
@@ -234,10 +238,14 @@ class LineExtractor ( Common ):
         if lineList is not None and lineListA is not None :
             log.info( "Line tagging....")
 
-            lineListIdentified = lineListA.line_identify( lineList )
+            min_length = int( max( [curr_image.width(), curr_image.height()] ) * 0.1 )
+
+            similarity_min = 0.7
+
+            lineListIdentified = lineListA.line_identify( lineList, min_length = min_length, similarity_min = similarity_min  )
 
             identify = curr_image.plot_lines( lineListIdentified )
-            identify.save_img_as_file(img_path, "identify")
+            identify.save_img_as_file(img_path, f"identify(min_length={min_length}")
             identify.plot_image(title="identify", border_color="blue", qtUi=qtUi, mode=mode)
 
             lineList.lineListIdentified = lineListIdentified
@@ -264,13 +272,13 @@ if __name__ == '__main__':
 
     img_path = ""
 
-    if 1 :
+    use_one_file = True
+
+    if use_one_file :
         img_path = "./data_yegan/set_01/_1018843.JPG"
         #img_path = "./data_yegan/set_01/_1018885.JPG"
-    pass
 
-    if img_path :
-        files.append( img_path )
+        files.append(img_path)
     else :
         folder = "./data_yegan/set_01"
         for ext in ('*.gif', '*.png', '*.jpg'):
@@ -280,33 +288,43 @@ if __name__ == '__main__':
 
     log.info( f"file count={ len(files )}" )
 
-    lineListAll = LineList()
+    lineListMatched = LineList()
 
-    for i in range( 0 , len(files), 2 ) :
+    len_files = len( files )
+    for i in range( 0 , len_files, 2 ) :
         file = files[i]
 
         img_path = file.replace( "\\", "/" )
 
-        lineList = lineExtractor.my_line_extract( img_path=img_path, qtUi=None )
+        log.info( "" )
+        log.info( "*"*80 )
+        log.info( f"[{i:04d}] [{100*i/len_files:.1f} %] {img_path}" )
+        log.info("*" * 80)
+        log.info("")
+
+        lineListA = lineExtractor.my_line_extract( img_path=img_path, qtUi=None )
 
         nextFile = lineExtractor.next_file( img_path )
 
-        if nextFile and nextFile is not None :
-            lineList = lineExtractor.my_line_extract( img_path=nextFile, qtUi=None, lineListA=lineList )
+        if nextFile is not None :
+            lineListB = lineExtractor.my_line_extract( img_path=nextFile, qtUi=None, lineListA=lineListA )
 
-            lineListAll.extend( lineList.lineListIdentified )
+            lineListMatched.extend(lineListB.lineListIdentified)
         pass
     pass
 
-    if lineListAll :
+    if lineListMatched :
         fileBase = os.path.basename(img_path)
         fileHeader, ext = os.path.splitext(fileBase)
         now = datetime.datetime.now()
         now_str = now.strftime('%m-%d_%H%M%S')
         now_str = now_str.split(".")[0]
-        json_file_name = os.path.join("/temp", f"{fileHeader}_{now_str}.json")
+        json_file_name = os.path.join( "C:/temp", f"{fileHeader}_{now_str}.json")
 
-        lineListAll.save_as_json(json_file_name=json_file_name)
+        width = lineExtractor.width
+        height = lineExtractor.height
+
+        lineListMatched.save_as_json(json_file_name=json_file_name, width=width, height=height )
     pass
 
     lineExtractor.print_profile()

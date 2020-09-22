@@ -528,7 +528,7 @@ class Image (Common) :
 
         contours = []
 
-        if cv.__version__ in [ "4.4.0" ] :
+        if cv.__version__.startswith("4." ) :
             ( contours_cv, _ ) = cv2.findContours(edged, mode, method)
             contours = contours_cv
         else :
@@ -750,10 +750,9 @@ class Image (Common) :
         minLineLength – 선의 최소 길이. 이 값보다 작으면 reject.
         maxLineGap – 선과 선사이의 최대 허용간격. 이 값보다 작으며 reject.
         '''
-        diagonal = math.sqrt(w * w + h * h)
 
-        threshold = 100
-        minLineLength = int( diagonal/50 )
+        threshold = 50
+        minLineLength = int( max([w, h])/50 )
         maxLineGap = 20
 
         lines_org = cv.HoughLinesP(img, 1, np.pi/180, threshold, lines=None, minLineLength=minLineLength, maxLineGap=maxLineGap )
