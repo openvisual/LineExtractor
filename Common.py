@@ -137,7 +137,7 @@ class Common :
         pass
     pass # -- chdir_to_curr_file
 
-    def next_file(self, fileName , debug = False ) :
+    def next_file(self, fileName , step = 1, debug = False ) :
         directory = os.path.dirname(fileName)
         log.info(f"dir = {directory}")
 
@@ -150,18 +150,24 @@ class Common :
 
         files = glob.glob(find_files)
 
+        idx = -1
+
         file_next = None
 
         fileBaseOrg = os.path.basename(fileName)
 
-        for file in files:
-            fileBase = os.path.basename(file)
+        for i, file in enumerate( files ):
+            fileBase = os.path.basename( file )
             debug and log.info(f"fileBase = {fileBase}")
 
-            if fileBase > fileBaseOrg:
-                file_next = file
+            if fileBase == fileBaseOrg :
+                idx = i + step
                 break
             pass
+        pass
+
+        if idx < len( files ) :
+            file_next = files[ idx ]
         pass
 
         if file_next is not None :

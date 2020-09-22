@@ -14,35 +14,47 @@ ret, thresh = cv.threshold(gray, 127, 255, 0)
 contours, hierarchy = cv.findContours(thresh, mode=1, method=2)
 
 for i, cnt in enumerate( contours ):
-    M = cv.moments(cnt)
-    0 and log.info( f"Moments = {M}" )
 
-    # area and perimeter
-    area = cv.contourArea(cnt)
-    perimeter = cv.arcLength(cnt, True)
+    if 0 :
+        M = cv.moments(cnt)
+        log.info(f"Moments = {M}")
+    pass
 
-    log.info( f"[{(i+1):03d}] area = {area}, perimeter = {perimeter}")
+    if 0 :
+        # Straight Bounding Rectangle
+        x, y, w, h = cv.boundingRect(cnt)
+        cv.rectangle( img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        log.info( f"x = {x}, y = {y}, w = {w}, h = {h}")
+    pass
 
-    # Straight Bounding Rectangle
-    x, y, w, h = cv.boundingRect(cnt)
-    cv.rectangle( img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    log.info( f"x = {x}, y = {y}, w = {w}, h = {h}")
+    if 0 :
+        # minimum enclosing circle
+        (x, y), radius = cv.minEnclosingCircle(cnt)
+        center = (int(x), int(y))
+        radius = int(radius)
+        cv.circle(img, center, radius, (255, 0, 0), 2)
+    pass
+
+    if 0 :
+        # Fitting an Ellipse
+        ellipse = cv.fitEllipse(cnt)
+        cv.ellipse(img, ellipse, (0, 255, 255), 2)
+    pass
+
+    if 1:
+        # area and perimeter
+        area = cv.contourArea(cnt)
+        perimeter = cv.arcLength(cnt, True)
+
+        log.info(f"[{(i + 1):03d}] area = {area}, perimeter = {perimeter}")
+    pass
 
     # Rotated Rectangle
-    rect = cv.minAreaRect(cnt)
-    box = cv.boxPoints(rect)
+    box = cv.boxPoints( cv.minAreaRect(cnt) )
     box = np.int0(box)
-    cv.drawContours(img, [box], 0, (0, 0, 255), 2)
 
-    # minimum enclosing circle
-    (x, y), radius = cv.minEnclosingCircle(cnt)
-    center = (int(x), int(y))
-    radius = int(radius)
-    cv.circle(img, center, radius, (255, 0, 0), 2)
-
-    # Fitting an Ellipse
-    ellipse = cv.fitEllipse(cnt)
-    cv.ellipse(img, ellipse, (0, 255, 255), 2)
+    log.info( f"box = {box}")
+    cv.drawContours(img, [ box ], 0, (0, 0, 255), 2)
 
     # Fitting a Line
     height, width = img.shape[:2]
