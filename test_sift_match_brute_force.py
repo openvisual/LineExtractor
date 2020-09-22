@@ -25,15 +25,15 @@ bf = cv2.BFMatcher()
 matches = bf.knnMatch(des1, des2, k=2)
 
 # Apply ratio test
-good = []
+goods = []
 for m, n in matches:
     if m.distance < 0.7*n.distance:
-        good.append([m])
+        goods.append([m])
     pass
 pass
 
 # cv2.drawMatchesKnn expects list of lists as matches.
-img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, good, None, flags=2)
+img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, goods, None, flags=2)
 
 plt.imshow(img3)
 plt.show()
