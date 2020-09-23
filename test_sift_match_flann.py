@@ -3,7 +3,6 @@
 import logging as log
 log.basicConfig( format='%(asctime)s, %(levelname)-8s [%(filename)s:%(lineno)04d] %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=log.INFO )
 
-import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
@@ -37,8 +36,8 @@ flann = cv2.FlannBasedMatcher(index_params, search_params)
 #Ratio test
 matches = flann.knnMatch(des1, des2, k=2)
 
-dim = max([len(img_1), len(img_1[0])]) * 0.3
-dim = dim*dim
+dim_square = max([len(img_1), len(img_1[0])]) * 0.3
+dim_square = dim_square*dim_square
 
 goods = []
 matchesMask = []
@@ -60,7 +59,7 @@ for i, (m1, m2) in enumerate(matches):
         dx = pt1[0] - pt2[0]
         dy = pt1[1] - pt2[1]
 
-        if dx*dx + dy*dy > dim :
+        if dx*dx + dy*dy > dim_square :
             valid = False
         pass
 
@@ -68,8 +67,8 @@ for i, (m1, m2) in enumerate(matches):
             goods.append( [m1, m2] )
             matchesMask.append( [1, 0] )
             print(i, pt1, pt2 )
-            if 0 and ( i % 5 == 0 ):
-                ## Draw pairs in purple, to make sure the result is ok
+            if 1 and ( i % 5 == 0 ):
+                # Draw pairs in purple, to make sure the result is ok
                 cv2.circle(img_1, (int(pt1[0]), int(pt1[1])), 5, (255, 0, 0), -1)
                 cv2.circle(img_2, (int(pt2[0]), int(pt2[1])), 5, (0, 0, 255), -1)
             pass
