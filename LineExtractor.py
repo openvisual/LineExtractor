@@ -145,6 +145,7 @@ class LineExtractor ( Common ):
         pass  # -- laplacian
 
         useGradient = not use_multi_ostus
+        useGradient = False
         if useGradient:  # TODO Gradient
             gradient = curr_image.gradient(bsize=7, kernel_type="cross")
 
@@ -170,13 +171,13 @@ class LineExtractor ( Common ):
                 algorithm = "multi_otsu"
             pass
 
-            bsize = 21
-            c = 0
+            bsize = 11
+            c = 2
             thresh = 15
 
             if "gaussian" in algorithm :
-                w, h = curr_image.dimension()
-                bsize = min( [w, h] )//2
+                bsize = 21
+                c = 3
             pass
 
             bin_image = curr_image.threshold(algorithm=algorithm, bsize=bsize, c=c, thresh=thresh)
