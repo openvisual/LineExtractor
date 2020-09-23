@@ -96,7 +96,10 @@ class LineList( list ) :
 
             for line in [ lineA, lineA.line_matched ] :
                 fileBase = line.fileBase
-                line_data[ fileBase ] = {"point1": conv_coord( line.a, w, h ), "point2": conv_coord( line.b, w, h ) }
+                line_data[ fileBase ] = {
+                                            "point1": conv_coord( line.a, w, h ),
+                                            "point2": conv_coord( line.b, w, h )
+                                         }
 
                 debug and log.info( f"id={line.id} , fileBase={fileBase}" )
             pass

@@ -162,15 +162,24 @@ class LineExtractor ( Common ):
             #algorithm = "isodata"
             #algorithm = "yen"
             #algorithm = "balanced"
-            #algorithm = "adaptive_gaussian"
+            algorithm = "adaptive_gaussian"
             #algorithm = "adaptive_mean"
-            algorithm = "global"
+            #algorithm = "global"
 
             if use_multi_ostus :
                 algorithm = "multi_otsu"
             pass
 
-            bin_image = curr_image.threshold(algorithm=algorithm, bsize=21, c=1, thresh=15)
+            bsize = 21
+            c = 0
+            thresh = 15
+
+            if "gaussian" in algorithm :
+                w, h = curr_image.dimension()
+                bsize = min( [w, h] )//2
+            pass
+
+            bin_image = curr_image.threshold(algorithm=algorithm, bsize=bsize, c=c, thresh=thresh)
 
             curr_image = bin_image
 
