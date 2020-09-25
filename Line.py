@@ -237,37 +237,37 @@ class Line:
 
     def get_most_mergeable_line_from_lines(self, lineList, error_deg= None, snap_dist= None ):
         line_found = None
-        similarity_min = 0
+        similarity_max = 0
 
         for line in lineList :
             if ( error_deg is None or snap_dist is None ) or self.is_mergeable( line, error_deg=error_deg, snap_dist=snap_dist) :
                 similarity = self.get_similarity(line)
-                if similarity >= similarity_min:
+                if similarity >= similarity_max:
                     line_found = line
-                    similarity_min = similarity
+                    similarity_max = similarity
                 pass
             pass
         pass
 
-        return line_found, similarity_min
+        return line_found, similarity_max
 
     pass  # --get_most_similar_line_from_list
 
     def get_most_mergeable_line_from_linegrps(self, lineGrpList , error_deg=1, snap_dist=5 ):
         lineGrp_found = None
         line_found = None
-        similarity_min = 0
+        similarity_max = 0
 
         for lineGrp in lineGrpList:
             line, similarity = self.get_most_mergeable_line_from_lines( lineGrp, error_deg=error_deg, snap_dist=snap_dist )
-            if similarity >= similarity_min:
+            if line is not None and similarity >= similarity_max:
                 lineGrp_found = lineGrp
                 line_found = line
-                similarity_min = similarity
+                similarity_max = similarity
             pass
         pass
 
-        return line_found, similarity_min, lineGrp_found
+        return line_found, similarity_max, lineGrp_found
 
     pass  # --get_most_similar_line_from_linegrp_list
 

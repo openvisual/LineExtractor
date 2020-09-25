@@ -73,46 +73,6 @@ class LineList( list ) :
         return lineList
     pass # -- identify
 
-    def save_as_json(self, json_file_name, width, height ):
-        debug = False
-        import json
-        #data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
-        data = {}
-
-        def conv_coord( point, w, h) :
-            x = int( point.x - w // 2 )
-            y = int( h // 2 - point.y )
-
-            return [ x, y ]
-        pass
-
-        w = width
-        h = height
-
-        lines = self
-
-        for i, lineA in enumerate( lines ) :
-            line_data = {}
-
-            for line in [ lineA, lineA.line_matched ] :
-                fileBase = line.fileBase
-                line_data[ fileBase ] = {
-                                            "point1": conv_coord( line.a, w, h ),
-                                            "point2": conv_coord( line.b, w, h )
-                                         }
-
-                debug and log.info( f"id={line.id} , fileBase={fileBase}" )
-            pass
-
-            data[ f"line{i +1}" ] = line_data
-        pass
-
-        with open( json_file_name, 'w') as f:
-            json.dump(data, f, indent=4 )
-        pass
-
-    pass # -- save_as_json
-
     @profile
     def merge_lines(self, error_deg=1, snap_dist=5):
         debug = False
@@ -121,21 +81,33 @@ class LineList( list ) :
 
         lines = list(filter(lambda x: x.length() != 0 , lines))
 
-        lineGroups = []
-
-        for line in lines :
-            line_found, _, lineGrp_found = line.get_most_mergeable_line_from_linegrps( lineGroups, error_deg=error_deg, snap_dist=snap_dist )
-            if line_found is not None :
-                lineGrp_found.append( line )
-            else :
-                lineGroups.append( [ line ] )
-            pass
-        pass
-
         merge_lines = []
-        for lineGrp in lineGroups :
-            merge_lines.append(LineList.merge_into_single_line(lineGrp))
-            #merge_lines.extend(LineList.merge_into_single_lines(lineGrp))
+
+        idx = 0
+
+        while idx < 5 and len( lines ) != len( merge_lines ) :
+            log.info( f"line merge[{idx}]" )
+            idx += 1
+
+            lineGrps = []
+
+            for line in lines :
+                line_found, _, lineGrp_found = line.get_most_mergeable_line_from_linegrps( lineGrps, error_deg=error_deg, snap_dist=snap_dist )
+                if line_found is not None :
+                    lineGrp_found.append( line )
+                else :
+                    lineGrps.append( [ line ] )
+                pass
+            pass
+
+            if len( lines ) > len( lineGrps) :
+                merge_lines = []
+                for lineGrp in lineGrps :
+                    merge_lines.append(LineList.merge_into_single_line(lineGrp))
+                pass
+            else :
+                merge_lines = lines
+            pass
         pass
 
         merge_lines = sorted(merge_lines, key=cmp_to_key(Line.compare_line_length))
@@ -170,93 +142,45 @@ class LineList( list ) :
 
     pass  # -- merge_into_single_line
 
-    @staticmethod
-    def merge_into_single_line_failed( lines ):
-        len_sum = 0
+    def save_as_json(self, json_file_name, width, height):
+        debug = False
+        import json
+        # data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
+        data = {}
 
-        lines = lines.copy()
+        def conv_coord(point, w, h):
+            x = int(point.x - w // 2)
+            y = int(h // 2 - point.y)
 
-        length_sum = 0
-        slope_rad = 0
+            return [x, y]
 
-        if True :
-            slope_rad_length_sum = 0
-
-            slope_rad_ref = lines[0].slope_radian()
-
-            for line in lines:
-                slope_rad_length_sum += ( slope_rad_ref - line.slope_radian() )
-                length_sum += line.length()
-            pass
-
-            slope_rad = slope_rad_ref + ( slope_rad_length_sum / len( lines ) )
         pass
 
-        xg = 0
-        yg = 0
+        w = width
+        h = height
 
-        for line in lines :
-            length = line.length()
+        lines = self
 
-            xg += length * ( line.a.x + line.b.x )
-            yg += length * ( line.a.y + line.b.y )
-        pass
+        for i, lineA in enumerate(lines):
+            line_data = {}
 
-        xg = xg / length_sum / len(lines)
-        yg = yg / length_sum / len(lines)
+            for line in [lineA, lineA.line_matched]:
+                fileBase = line.fileBase
+                line_data[fileBase] = {
+                    "point1": conv_coord(line.a, w, h),
+                    "point2": conv_coord(line.b, w, h)
+                }
 
-        theta = slope_rad
-
-        lines_rotated = [None] * len(lines)
-
-        if True :
-            rotate_project = np.array([cos(theta), sin(theta)] )
-            r = rotate_project
-
-            for i in range( len( lines_rotated ) ) :
-                line = lines[ i ]
-
-                p = line.a
-                p = np.array([p.x - xg, p.y - yg])
-                x = np.dot(r, p)
-                y = 0
-                a = Point(x, y)
-
-                p = line.b
-                p = np.array([p.x - xg, p.y - yg])
-                x = np.dot(r, p)
-                y = 0
-                b = Point(x, y)
-
-                lines_rotated[i] = Line( a=a, b=b, id=line.id )
-            pass
-        pass
-
-        min_a = lines_rotated[0].a
-        max_b = lines_rotated[0].b
-
-        for line in lines_rotated :
-            if line.a.x < min_a.x :
-                min_a = line.a
+                debug and log.info(f"id={line.id} , fileBase={fileBase}")
             pass
 
-            if line.b.x > max_b.x :
-                max_b = line.b
-            pass
+            data[f"line{i + 1}"] = line_data
         pass
 
-        rotate_matrix = np.array([[cos( - theta), sin( - theta)], [-sin( - theta), cos( - theta)]])
-        r = rotate_matrix
+        with open(json_file_name, 'w') as f:
+            json.dump(data, f, indent=4)
+        pass
 
-        p = np.matmul(r, [min_a.x, min_a.y])
-        a = Point( int( xg + p[0] ), int( yg + p[1] ) )
-
-        p = np.matmul(r, [max_b.x, max_b.y])
-        b = Point( int( xg + p[0] ), int( yg + p[1] ) )
-
-        merge_line = Line( a = a, b = b )
-
-        return merge_line
-    pass # -- merge_into_single_line
+    pass  # -- save_as_json
 
 pass # -- LineList
