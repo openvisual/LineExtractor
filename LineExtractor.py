@@ -280,15 +280,15 @@ if __name__ == '__main__':
 
     files = []
 
-    use_one_file = True
+    img_path = "./data_yegan/set_01/_1018843.JPG"
+    img_path = "./data_yegan/set_01"
 
-    if use_one_file :
-        img_path = "./data_yegan/set_01/_1018843.JPG"
+    if not os.path.isdir( img_path ) :
         #img_path = "./data_yegan/set_01/_1018885.JPG"
 
         files.append(img_path)
     else :
-        folder = "./data_yegan/set_01"
+        folder = img_path
         for ext in ('*.gif', '*.png', '*.jpg'):
             files.extend(glob(join( folder, ext)))
         pass

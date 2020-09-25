@@ -85,10 +85,21 @@ class LineList( list ) :
         while i < len( lines ) :
             line = lines[ i ]
             line_found, _ = line.get_most_mergeable_line_from_lines( lines, error_deg=error_deg, snap_dist=snap_dist )
-            if line_found is not None :
-                lines.remove( line_found )
+            if line_found is not None and line != line_found :
                 line_merge = line.merge( line_found )
-                lines[ i ] = line_merge
+
+                index = lines.index( line_found )
+                if index < i :
+                    lines[ index ] = line_merge
+
+                    lines.pop( i )
+
+                    i = index
+                else :
+                    lines[ i ] = line_merge
+
+                    lines.pop( index )
+                pass
             else :
                 i += 1
             pass
