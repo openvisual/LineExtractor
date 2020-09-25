@@ -240,7 +240,9 @@ class Line:
         similarity_max = 0
 
         for line in lineList :
-            if ( error_deg is None or snap_dist is None ) or self.is_mergeable( line, error_deg=error_deg, snap_dist=snap_dist) :
+            if self == line :
+                pass
+            elif ( error_deg is None or snap_dist is None ) or self.is_mergeable( line, error_deg=error_deg, snap_dist=snap_dist) :
                 similarity = self.get_similarity(line)
                 if similarity >= similarity_max:
                     line_found = line
