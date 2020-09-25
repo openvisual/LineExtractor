@@ -280,8 +280,6 @@ if __name__ == '__main__':
 
     files = []
 
-    img_path = ""
-
     use_one_file = True
 
     if use_one_file :
