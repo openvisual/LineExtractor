@@ -7,6 +7,9 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 import logging as log
 log.basicConfig( format='%(asctime)s, %(levelname)-8s [%(filename)s:%(lineno)04d] %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=log.INFO )
 
+from os.path import join
+from glob import glob
+
 import os, datetime
 from Common import *
 
@@ -268,20 +271,15 @@ class LineExtractor ( Common ):
 pass # -- LineExtractor
 
 if __name__ == '__main__':
-
     lineExtractor = LineExtractor()
 
     lineExtractor.show_versions()
-
     lineExtractor.chdir_to_curr_file()
-
-    from os.path import join
-    from glob import glob
 
     files = []
 
     img_path = "./data_yegan/set_01/_1018843.JPG"
-    img_path = "./data_yegan/set_01"
+    #img_path = "./data_yegan/set_01"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)
@@ -351,7 +349,4 @@ if __name__ == '__main__':
     pass
 
     log.info("Good bye!")
-
 pass # -- main
-
-# end
