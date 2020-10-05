@@ -97,11 +97,13 @@ class Image (Common) :
 
         cmap = "gray"
 
-        if len( img ) == 3 :
+        if hasattr(img, "shape") and len( img.shape) > 2 and img.shape[2] == 3 :
             cmap = None
-        pass
 
-        plt.imsave(fileName, img, cmap=cmap)
+            cv2.imwrite(fileName, img)
+        else :
+            plt.imsave(fileName, img, cmap=cmap)
+        pass
 
         self.fileName = fileName
 
