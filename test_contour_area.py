@@ -53,22 +53,28 @@ for i, contour in enumerate(contours):
     box = cv.boxPoints(cv.minAreaRect(contour))
     box = np.int0(box)
 
-    log.info( f"box = {box}" )
+    text = [ ", ".join( item ) for item in box.astype(str) ]
+
+    log.info( f"box = { text }" )
     cv.drawContours(img, [ box ], 0, (0, 0, 255), 2)
 
     # Fitting a Line
     height, width = img.shape[:2]
 
     # (vx, vy, x0, y0),
-    # (vx, vy) is a normalized vector collinear to the line
+    # (vx, vy) is a vector collinear to the line
     # (x0, y0) is a point on the line.
-    [vx, vy, x, y] = cv.fitLine(contour, cv.DIST_L2, 0, 0.01, 0.01)
+    [ax, ay, x0, y0] = cv.fitLine(contour, cv.DIST_L2, 0, 0.01, 0.01)
 
-    lefty = int((-x * vy / vx) + y)
-    righty = int(((width - x) * vy / vx) + y)
+    log.info(f"fitLine: ax = {ax}, ay = {ay}, x0 = {x0}, y0 = {y0}")
+
+    a = ay/ax
+
+    b = y0 - a * x0
+    y2 = y0 + a * (width - 1 - x0)
 
     #cv.line(img, ( int( x ), int( y ) ), ( int( vx ), int( vy ) ), (255, 255, 0), 2)
-    cv.line(img, (width - 1, righty), (0, lefty), (255, 255, 0), 2)
+    cv.line(img, (0, int(b)), (width - 1, int(y2)), (255, 255, 0), 2)
 pass
 
 plt.imshow( img )
