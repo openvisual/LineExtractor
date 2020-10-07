@@ -59,18 +59,17 @@ for i, contour in enumerate(contours):
     cv.drawContours(img, [ box ], 0, (0, 0, 255), 2)
 
     # Fitting a Line
-    height, width = img.shape[:2]
-
-    # (vx, vy, x0, y0),
-    # (vx, vy) is a vector collinear to the line
+    # (ax, ay) is a vector collinear to the line
     # (x0, y0) is a point on the line.
-    [ax, ay, x0, y0] = cv.fitLine(contour, cv.DIST_L2, 0, 0.01, 0.01)
+    [ax, ay, x0, y0] = cv.fitLine(contour, cv.DIST_L2, 0, 0.001, 0.001)
 
     log.info(f"fitLine: ax = {ax}, ay = {ay}, x0 = {x0}, y0 = {y0}")
 
+    _, width = img.shape[:2]
+
     a = ay/ax
 
-    b = y0 - a * x0
+    b  = y0 - a * x0
     y2 = y0 + a * (width - 1 - x0)
 
     #cv.line(img, ( int( x ), int( y ) ), ( int( vx ), int( vy ) ), (255, 255, 0), 2)
