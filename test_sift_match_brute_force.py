@@ -34,14 +34,37 @@ axes[0].imshow(img1)
 axes[1].imshow(img2)
 plt.show()
 
+plt.imsave( 'c:/temp/img_1.png', img1)
+plt.imsave( 'c:/temp/img_2.png', img2)
+
 # BFMatcher with default params
 bf = cv2.BFMatcher()
 matches = bf.knnMatch(des1, des2, k=2)
 
+max_dy = len( img1 ) * 0.3
+max_dx = len( img1[0] ) * 0.3
+
 # Apply ratio test
 goods = []
 for m, n in matches:
-    if m.distance < 0.7*n.distance:
+    valid = True
+    if valid and m.distance > 0.7*n.distance:
+        valid = False
+    pass
+
+    if valid:
+        pt1 = kp1[m.queryIdx].pt
+        pt2 = kp2[n.trainIdx].pt
+
+        dx = abs( pt1[0] - pt2[0] )
+        dy = abs( pt1[1] - pt2[1] )
+
+        if dx > max_dx or dy > max_dy :
+            valid = False
+        pass
+    pass
+
+    if valid :
         goods.append([m])
     pass
 pass
@@ -51,3 +74,5 @@ img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, goods, None, flags=2)
 
 plt.imshow(img3)
 plt.show()
+
+plt.imsave( 'c:/temp/img_3.png', img3)
