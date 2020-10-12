@@ -9,16 +9,30 @@ from Common import *
 common = Common()
 
 img_path = "./data_yegan/set_01/_1018864.JPG"
-img1 = cv2.imread( img_path, 0)          # queryImage
+img_path = "./data_line/shapes_and_colors 01.png"
+
+img1 = cv2.imread( img_path, 1)          # queryImage
+gray1 = cv2.cvtColor( img1, cv2.COLOR_BGR2GRAY)
+
 next_img_path = common.next_file( img_path )
-img2 = cv2.imread( next_img_path , 0) # trainImage
+img2 = cv2.imread( next_img_path , 1) # trainImage
+gray2 = cv2.cvtColor( img2, cv2.COLOR_BGR2GRAY)
+
 
 # Initiate SIFT detector
-sift = cv2.xfeatures2d.SIFT_create()
+sift = cv2.SIFT_create()
 
 # find the keypoints and descriptors with SIFT
-kp1, des1 = sift.detectAndCompute(img1, None)
-kp2, des2 = sift.detectAndCompute(img2, None)
+kp1, des1 = sift.detectAndCompute( gray1, None)
+kp2, des2 = sift.detectAndCompute( gray2, None)
+
+img1 = cv2.drawKeypoints( gray1, kp1, img1, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+img2 = cv2.drawKeypoints( gray2, kp2, img2, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+fig, axes = plt.subplots( nrows=1, ncols=2)
+axes[0].imshow(img1)
+axes[1].imshow(img2)
+plt.show()
 
 # BFMatcher with default params
 bf = cv2.BFMatcher()
