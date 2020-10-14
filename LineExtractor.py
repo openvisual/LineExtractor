@@ -279,7 +279,7 @@ if __name__ == '__main__':
     files = []
 
     img_path = "./data_yegan/set_01/_1018843.JPG"
-    img_path = "./data_yegan/set_03/DJI_0001.JPG"
+    #img_path = "./data_yegan/set_03/DJI_0001.JPG"
 
     #img_path = "./data_yegan/set_01"
 
@@ -331,7 +331,7 @@ if __name__ == '__main__':
         width = lineExtractor.width
         height = lineExtractor.height
 
-        save = False
+        save = True
 
         save and lineListMatched.save_as_json(json_file_name=json_file_name, width=width, height=height )
     pass

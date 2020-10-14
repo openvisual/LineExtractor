@@ -190,20 +190,26 @@ class LineList( list ) :
 
     def save_as_json(self, json_file_name, width, height):
         debug = False
+
         import json
-        # data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
+
+        #data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
         data = {}
 
         def conv_coord(point, w, h):
-            x = int(point.x - w // 2)
-            y = int(h // 2 - point.y)
+            x = point.x - w / 2
+            y = h / 2 - point.y
+
+            if w % 2 == 0 :
+                x = x + 0.5
+            pass
+
+            if h % 2 == 0 :
+                y = y - 0.5
+            pass
 
             return [x, y]
-
         pass
-
-        w = width
-        h = height
 
         lines = self
 
@@ -213,8 +219,8 @@ class LineList( list ) :
             for line in [lineA, lineA.line_matched]:
                 fileBase = line.fileBase
                 line_data[fileBase] = {
-                    "point1": conv_coord(line.a, w, h),
-                    "point2": conv_coord(line.b, w, h)
+                    "point1": conv_coord(line.a, width, height),
+                    "point2": conv_coord(line.b, width, height)
                 }
 
                 debug and log.info(f"id={line.id} , fileBase={fileBase}")
