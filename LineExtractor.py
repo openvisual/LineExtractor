@@ -308,7 +308,7 @@ if __name__ == '__main__':
     img_path = "./data_yegan/set_01/_1018843.JPG"
     #img_path = "./data_yegan/set_03/DJI_0001.JPG"
 
-    #img_path = "./data_yegan/set_01"
+    img_path = "./data_yegan/set_01"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)
@@ -316,7 +316,7 @@ if __name__ == '__main__':
         folder = img_path
 
         for ext in ('*.gif', '*.png', '*.jpg'):
-            files.extend(glob(join(folder, ext)))
+            files.extend(glob.glob(join(folder, ext)))
         pass
     pass
 
