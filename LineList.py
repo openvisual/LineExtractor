@@ -196,8 +196,8 @@ class LineList( list ) :
         #data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
         data = {}
 
-        width += mw
-        height += mh
+        width += 2*mw
+        height += 2*mh
 
         def conv_coord(point, w, h):
             x = point.x - w / 2
