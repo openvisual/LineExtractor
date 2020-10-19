@@ -353,7 +353,7 @@ if __name__ == '__main__':
         now = datetime.datetime.now()
         now_str = now.strftime('%m-%d_%H%M%S')
         now_str = now_str.split(".")[0]
-        json_file_name = os.path.join( "C:/temp", f"{fileHeader}_{now_str}.json")
+        json_file_name = os.path.join( "C:/temp", f"z{fileHeader}_{now_str}.json")
 
         width = lineExtractor.width
         height = lineExtractor.height
