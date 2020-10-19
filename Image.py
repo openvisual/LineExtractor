@@ -364,7 +364,7 @@ class Image (Common) :
     pass
 
     @profile
-    def grayscale(self):
+    def grayscale(self, margin=[0, 0]):
         # grayscale 변환 함수
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 

@@ -188,13 +188,16 @@ class LineList( list ) :
 
     pass  # -- merge_into_single_line
 
-    def save_as_json(self, json_file_name, width, height):
+    def save_as_json(self, json_file_name, width, height, mw = 0, mh = 0 ):
         debug = False
 
         import json
 
         #data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
         data = {}
+
+        width += mw
+        height += mh
 
         def conv_coord(point, w, h):
             x = point.x - w / 2

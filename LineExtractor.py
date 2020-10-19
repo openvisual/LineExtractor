@@ -23,6 +23,9 @@ class LineExtractor ( Common ):
 
         self.width = None
         self.height = None
+
+        self.margin_width = 0
+        self.margin_height = 0
     pass
 
     @profile
@@ -83,8 +86,13 @@ class LineExtractor ( Common ):
         width = img_org.shape[1]
         channel_cnt = img_org.shape[2]
 
-        self.width = width
+        margin_ratio = 5
+
+        self.width  = width
         self.height = height
+
+        self.margin_width  = int( width * margin_ratio/100.0 )
+        self.margin_height = int( height * margin_ratio/100.0 )
 
         log.info(f"Image width: {width}, height: {height}, channel: {channel_cnt}")
 
@@ -94,6 +102,25 @@ class LineExtractor ( Common ):
         0 and image_org.plot_image(title=title, cmap=None, border_color = "green", qtUi=qtUi, mode=mode)
 
         curr_image = image_org
+
+        if True :
+            # roi image crop
+            mw = self.margin_width
+            mh = self.margin_height
+
+            img_roi = img_org[ mh : (height - mh), mw : (width - mw) ]
+
+            height = img_roi.shape[0]
+            width  = img_roi.shape[1]
+
+            self.height = height
+            self.width  = width
+
+            image_roi = Image( img_roi )
+            image_roi.save_img_as_file( img_path, "roi" )
+
+            curr_image = image_roi
+        pass # -- roi image crop
 
         if 1 : # -- grayscale 변환
             #grayscale = curr_image.to_grayscale_multiotsu()
@@ -331,9 +358,12 @@ if __name__ == '__main__':
         width = lineExtractor.width
         height = lineExtractor.height
 
+        mw = lineExtractor.margin_width
+        mh = lineExtractor.margin_height
+
         save = True
 
-        save and lineListMatched.save_as_json(json_file_name=json_file_name, width=width, height=height )
+        save and lineListMatched.save_as_json(json_file_name=json_file_name, width=width, height=height, mw=mw, mh=mh )
     pass
 
     lineExtractor.print_profile()
