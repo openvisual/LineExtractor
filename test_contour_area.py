@@ -55,7 +55,9 @@ for i, contour in enumerate(contours):
 
     text = [ ", ".join( item ) for item in box.astype(str) ]
 
-    log.info( f"box = { text }" )
+    box_area = cv2.contourArea( box )
+
+    log.info( f"box = { text }, area = { box_area }" )
     cv.drawContours(img, [ box ], 0, (0, 0, 255), 2)
 
     # Fitting a Line
