@@ -193,7 +193,6 @@ class LineList( list ) :
 
         import json
 
-        #data = {'name': 'Scott', 'website': 'stackabuse.com', 'from': 'Nebraska'}
         data = {}
 
         width += 2*mw
