@@ -246,9 +246,9 @@ class LineExtractor ( Common ):
 
         useContour = True
         if useContour:
-            contour = curr_image.contours(lineWidth=2, useFilter=True)
+            contour_image = curr_image.contours(lineWidth=2, useFilter=True)
 
-            curr_image = contour
+            curr_image = contour_image
 
             curr_image.save_img_as_file(img_path, curr_image.algorithm)
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
@@ -308,7 +308,7 @@ if __name__ == '__main__':
     img_path = "./data_yegan/set_01/_1018843.JPG"
     #img_path = "./data_yegan/set_03/DJI_0001.JPG"
 
-    img_path = "./data_yegan/set_01"
+    #img_path = "./data_yegan/set_01"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)

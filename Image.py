@@ -540,17 +540,23 @@ class Image (Common) :
 
         data = np.zeros((h, w, 3), dtype="uint8")
 
-        useFilter = True
         if useFilter :
-            filters = []
-            diagonal = math.sqrt( w*w + h*h )
-            ref_len = diagonal*0.1
+            contours_filtered = []
+
+            ref_len = max(w, h)*0.1
+
             ref_width = min( w, h )/30
             ref_height = ref_width
-            ref_area = w*h/10_000
 
             for i, contour in enumerate( contours ):
                 valid = True
+
+                if valid:
+                    arc_len = cv2.arcLength(contour, 0)
+                    debug and log.info(f"[{i:03d} contour = {arc_len}")
+                    valid = (arc_len > ref_len)
+                pass
+
                 if valid :
                     rect = cv2.minAreaRect(contour)
 
@@ -563,20 +569,14 @@ class Image (Common) :
                 pass
 
                 if valid :
-                    arc_len = cv2.arcLength( contour , 0 )
-                    debug and log.info( f"[{i:03d} contour = {arc_len}" )
-                    valid = ( arc_len > ref_len )
-                pass
-
-                if valid :
-                    filters.append( contour )
+                    contours_filtered.append( contour )
                 pass
             pass
 
             log.info(f"org contours len = {len(contours)}")
-            log.info(f"filters len = {len(filters)}")
+            log.info(f"filters len = {len(contours_filtered)}")
 
-            cv2.polylines(data, filters, 0, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
+            cv2.polylines(data, contours_filtered, 0, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
         else :
             cv2.drawContours(data, contours, -1, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
         pass
