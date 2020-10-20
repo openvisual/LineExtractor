@@ -247,14 +247,13 @@ class LineExtractor ( Common ):
         useContour = True
         if useContour:
             contours = curr_image.extract_contours()
-
             contours_image = curr_image.draw_contours(contours, lineWidth=2)
-            curr_image = contours_image
-            curr_image.save_img_as_file(img_path, curr_image.algorithm)
+            contours_image.save_img_as_file(img_path, contours_image.algorithm)
 
-            contours = curr_image.filter_contours( contours )
-            contours_image = curr_image.draw_contours(contours, lineWidth=2)
-            curr_image.save_img_as_file(img_path, curr_image.algorithm + "_filtered")
+            contours = contours_image.filter_contours( contours )
+            contours_image = contours_image.draw_contours(contours, lineWidth=2)
+            contours_image.save_img_as_file(img_path, contours_image.algorithm + "_filtered")
+
             curr_image = contours_image
 
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
