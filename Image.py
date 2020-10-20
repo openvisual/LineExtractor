@@ -524,8 +524,6 @@ class Image (Common) :
 
         algorithm = f"contours(mode={mode}, method={method})"
 
-        max_img = np.max( img )
-
         edged = img
 
         contours = []
@@ -538,7 +536,8 @@ class Image (Common) :
             contours = contours_cv
         pass
 
-        data = np.zeros((h, w, 3), dtype="uint8")
+        # 3 channel image for line drawing width color
+        data = np.zeros( [h, w, 3], dtype="uint8")
 
         if useFilter :
             contours_filtered = []
@@ -558,14 +557,13 @@ class Image (Common) :
                 pass
 
                 if valid :
-                    rect = cv2.minAreaRect(contour)
+                    min_rotated_rect = cv.minAreaRect(contour)
+                    min_box_width  = min_rotated_rect[1][0]
+                    min_box_height = min_rotated_rect[1][1]
 
-                    rect_width = rect[1][0]
-                    rect_height = rect[1][1]
+                    valid = ( min_box_width > ref_width or min_box_height > ref_height )
 
-                    valid = ( rect_width > ref_width or rect_height > ref_height )
-
-                    debug and log.info(f"[{i:03d}] rect valid={valid}, width = {rect_width}, height = {rect_height}")
+                    debug and log.info(f"[{i:03d}] rect valid={valid}, width = {min_box_width}, height = {min_box_height}")
                 pass
 
                 if valid :
