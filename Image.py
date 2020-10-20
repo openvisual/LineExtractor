@@ -501,7 +501,7 @@ class Image (Common) :
     pass  # -- canny
 
     @profile
-    def extract_contours(self, lineWidth=1, useFilter = True):
+    def extract_contours(self):
         # TODO  등고선
         #  https://docs.opencv.org/trunk/d4/d73/tutorial_py_contours_begin.html
 
@@ -536,55 +536,78 @@ class Image (Common) :
             contours = contours_cv
         pass
 
+        return contours
+    pass
+
+    @profile
+    def filter_contours(self, contours):
+        # 등고선을 필터링한다.
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        debug = False
+
+        contours_filtered = []
+
+        ref_len = max(w, h) * 0.1
+
+        ref_width = min(w, h) / 30
+        ref_height = ref_width
+
+        for i, contour in enumerate(contours):
+            valid = True
+
+            if valid:
+                arc_len = cv2.arcLength(contour, 0)
+                debug and log.info(f"[{i:03d} contour = {arc_len}")
+                valid = (arc_len > ref_len)
+            pass
+
+            if valid:
+                min_rotated_rect = cv.minAreaRect(contour)
+                min_box_width = min_rotated_rect[1][0]
+                min_box_height = min_rotated_rect[1][1]
+
+                valid = (min_box_width > ref_width or min_box_height > ref_height)
+
+                debug and log.info(
+                    f"[{i:03d}] rect valid={valid}, width = {min_box_width}, height = {min_box_height}")
+            pass
+
+            if valid:
+                contours_filtered.append(contour)
+            pass
+        pass
+
+        log.info(f"org contours len = {len(contours)}, filters len = {len(contours_filtered)}")
+
+        return contours_filtered
+
+    pass # -- filter contours
+
+    @profile
+    def draw_contours(self, contours, lineWidth = 1):
+        debug = False
+
+        img = self.img
+
+        img = img.astype(np.uint8)
+
+        h = len(img)
+        w = len(img[0])
+
         # 3 channel image for line drawing width color
         data = np.zeros( [h, w, 3], dtype="uint8")
 
-        if useFilter :
-            contours_filtered = []
-
-            ref_len = max(w, h)*0.1
-
-            ref_width = min( w, h )/30
-            ref_height = ref_width
-
-            for i, contour in enumerate( contours ):
-                valid = True
-
-                if valid:
-                    arc_len = cv2.arcLength(contour, 0)
-                    debug and log.info(f"[{i:03d} contour = {arc_len}")
-                    valid = (arc_len > ref_len)
-                pass
-
-                if valid :
-                    min_rotated_rect = cv.minAreaRect(contour)
-                    min_box_width  = min_rotated_rect[1][0]
-                    min_box_height = min_rotated_rect[1][1]
-
-                    valid = ( min_box_width > ref_width or min_box_height > ref_height )
-
-                    debug and log.info(f"[{i:03d}] rect valid={valid}, width = {min_box_width}, height = {min_box_height}")
-                pass
-
-                if valid :
-                    contours_filtered.append( contour )
-                pass
-            pass
-
-            log.info(f"org contours len = {len(contours)}")
-            log.info(f"filters len = {len(contours_filtered)}")
-
-            cv2.polylines(data, contours_filtered, 0, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
-        else :
-            cv2.drawContours(data, contours, -1, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
-        pass
+        cv2.drawContours(data, contours, -1, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
 
         gray = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
 
         _, data = cv.threshold(gray, 127, 255, cv.THRESH_BINARY)
 
-        return Image( img=data, algorithm=algorithm)
-    pass  # -- contours
+        algorithm = "contours"
+
+        return Image( img=data, algorithm=algorithm )
+    pass  # -- draw_contours
 
     @profile
     def remove_noise(self, algorithm , bsize=5 , sigmaColor=75, sigmaSpace=75):
