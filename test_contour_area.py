@@ -50,15 +50,15 @@ for i, contour in enumerate(contours):
     pass
 
     # Rotated Rectangle
-    box = cv.boxPoints(cv.minAreaRect(contour))
-    box = np.int0(box)
+    min_box = cv.boxPoints( cv.minAreaRect(contour) )
+    min_box = np.int0(min_box)
 
-    text = [ ", ".join( item ) for item in box.astype(str) ]
+    text = [ ", ".join( item ) for item in min_box.astype(str)]
 
-    box_area = cv2.contourArea( box )
+    min_box_area = cv2.contourArea(min_box)
 
-    log.info( f"box = { text }, area = { box_area }" )
-    cv.drawContours(img, [ box ], 0, (0, 0, 255), 2)
+    log.info( f"rotated_box = { text }, area = { min_box_area }")
+    cv.drawContours(img, [min_box], 0, (0, 0, 255), 2, cv.LINE_AA)
 
     # Fitting a Line
     # (ax, ay) is a vector collinear to the line
@@ -72,10 +72,13 @@ for i, contour in enumerate(contours):
     a = ay/ax
 
     b  = y0 - a * x0
-    y2 = y0 + a * (width - 1 - x0)
+    x1 = 0
+    y1 = int( b )
 
-    #cv.line(img, ( int( x ), int( y ) ), ( int( vx ), int( vy ) ), (255, 255, 0), 2)
-    cv.line(img, (0, int(b)), (width - 1, int(y2)), (255, 255, 0), 2)
+    x2 = width - 1
+    y2 = int( y0 + a * (width - 1 - x0) )
+
+    cv.line(img, (x1, y1), ( x2, y2), (255, 255, 0), 2, cv.LINE_AA)
 pass
 
 plt.imshow( img )
