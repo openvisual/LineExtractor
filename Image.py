@@ -513,9 +513,6 @@ class Image (Common) :
 
         img = img.astype(np.uint8)
 
-        h = len( img )
-        w = len( img[0] )
-
         mode = cv.RETR_TREE
         #mode = cv2.RETR_EXTERNAL
         method = cv.CHAIN_APPROX_SIMPLE
@@ -547,6 +544,11 @@ class Image (Common) :
         debug = False
 
         contours_filtered = []
+
+        img = self.img
+
+        h = len(img)
+        w = len(img[0])
 
         ref_len = max(w, h) * 0.1
 

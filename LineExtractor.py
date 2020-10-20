@@ -252,7 +252,7 @@ class LineExtractor ( Common ):
             curr_image = contours_image
             curr_image.save_img_as_file(img_path, curr_image.algorithm)
 
-            contours_filtered = curr_image.filter_contours( contours )
+            contours = curr_image.filter_contours( contours )
             contours_image = curr_image.draw_contours(contours, lineWidth=2)
             curr_image.save_img_as_file(img_path, curr_image.algorithm + "_filtered")
             curr_image = contours_image
