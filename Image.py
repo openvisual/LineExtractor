@@ -501,7 +501,7 @@ class Image (Common) :
     pass  # -- canny
 
     @profile
-    def contours(self, lineWidth=1, useFilter = True):
+    def extract_contours(self, lineWidth=1, useFilter = True):
         # TODO  등고선
         #  https://docs.opencv.org/trunk/d4/d73/tutorial_py_contours_begin.html
 

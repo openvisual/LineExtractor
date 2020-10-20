@@ -246,7 +246,7 @@ class LineExtractor ( Common ):
 
         useContour = True
         if useContour:
-            contour_image = curr_image.contours(lineWidth=2, useFilter=True)
+            contour_image = curr_image.extract_contours(lineWidth=2, useFilter=True)
 
             curr_image = contour_image
 
