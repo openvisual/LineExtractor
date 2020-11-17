@@ -14,7 +14,10 @@ image = data.stereo_motorcycle()[0]
 
 image = data.astronaut()
 
-image = io.imread( "./data_yegan/set_01/_1018843.JPG" )
+path = "./data_yegan/set_01/_1018843.JPG"
+path = "./data_yegan/set_04/P1010015.JPG"
+path = "./data_yegan/set_05/DJI_0004.JPG"
+image = io.imread( path )
 
 image = rgb2gray(image)
 
