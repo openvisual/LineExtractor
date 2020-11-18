@@ -580,11 +580,65 @@ class Image (Common) :
             pass
         pass
 
-        log.info(f"org contours len = {len(contours)}, filters len = {len(contours_filtered)}")
+        log.info(f"org contours len = {len(contours)}, contours filtered len = {len(contours_filtered)}")
 
         return contours_filtered
 
     pass # -- filter contours
+
+
+    def filter_lines_only(self, contours):
+        # 직선을 필터링 한다.
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        debug = False
+
+        lines_filtered = []
+
+        img = self.img
+
+        h = len(img)
+        w = len(img[0])
+
+        ref_len = max(w, h) * 0.1
+
+        ref_width = min(w, h) / 30
+        ref_height = ref_width
+
+        for i, contour in enumerate(contours):
+            lines = self.filter_lines_from_polyline( contour )
+            lines_filtered.extend( lines )
+        pass
+
+        log.info(f"org contours len = {len(contours)}, lines only len = {len(lines_filtered)}")
+
+        return lines_filtered
+
+    pass  # -- filter lines only
+
+    @profile
+    def filter_lines_from_polyline(self, polyline):
+        lines = []
+
+        idx_fr = 0
+        idx_to = 0
+        poly_len = len( polyline )
+
+        is_good = True
+        while is_good :
+            idx_to += 1
+
+            if idx_to == poly_len :
+                is_good = False
+            pass
+
+            if not is_good :
+                lines.append( polyline )
+            pass
+        pass
+
+        return lines
+    pass
 
     @profile
     def draw_contours(self, contours, lineWidth = 1):

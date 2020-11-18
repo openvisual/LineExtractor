@@ -250,9 +250,13 @@ class LineExtractor ( Common ):
             contours_image = curr_image.draw_contours(contours, lineWidth=2)
             contours_image.save_img_as_file(img_path, contours_image.algorithm)
 
-            contours = contours_image.filter_contours( contours )
+            contours = contours_image.filter_contours(contours)
             contours_image = contours_image.draw_contours(contours, lineWidth=2)
             contours_image.save_img_as_file(img_path, contours_image.algorithm + "_filtered")
+
+            lines = contours_image.filter_lines_only( contours )
+            contours_image = contours_image.draw_contours(lines, lineWidth=2)
+            contours_image.save_img_as_file(img_path, contours_image.algorithm + "_lines_only")
 
             curr_image = contours_image
 
@@ -311,7 +315,7 @@ if __name__ == '__main__':
     files = []
 
     img_path = "./data_yegan/set_01/_1018843.JPG"
-    img_path = "./data_yegan/set_04/P1010015.JPG"
+    #img_path = "./data_yegan/set_04/P1010015.JPG"
     #img_path = "./data_yegan/set_04"
 
     #img_path = "./data_yegan/set_01"

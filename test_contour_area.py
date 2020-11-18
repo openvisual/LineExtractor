@@ -54,15 +54,15 @@ for i, contour in enumerate(contours):
     min_box = cv.boxPoints( min_rect )
     min_box = np.int0(min_box)
 
-    text = [ ", ".join( item ) for item in min_box.astype(str)]
+    text = [ ", ".join( item ) for item in min_box.astype(str) ]
 
     min_box_area = cv2.contourArea(min_box)
 
-    area_width  = cv2.norm( min_box[0] - min_box[1], cv2.NORM_L2)
-    area_height = cv2.norm( min_box[1] - min_box[2], cv2.NORM_L2)
+    area_width  = cv2.norm( min_box[0] - min_box[1], cv2.NORM_L2 )
+    area_height = cv2.norm( min_box[1] - min_box[2], cv2.NORM_L2 )
 
     log.info( f"rotated_box = { text }, area = { min_box_area }, width = {area_width: .2f}, height = {area_height: .2f}")
-    cv.drawContours(img, [min_box], 0, (0, 0, 255), 2, cv.LINE_AA)
+    cv.drawContours(img, [ min_box ], 0, (0, 0, 255), 2, cv.LINE_AA)
 
     # Fitting a Line
     # (ax, ay) is a vector collinear to the line
@@ -75,7 +75,7 @@ for i, contour in enumerate(contours):
 
     a = ay/ax
 
-    b  = y0 - a * x0
+    b = y0 - a * x0
     x1 = 0
     y1 = int( b )
 
