@@ -606,7 +606,7 @@ class Image (Common) :
         ref_height = ref_width
 
         for i, contour in enumerate(contours):
-            lines = self.filter_lines_from_polyline( contour )
+            lines = self.filter_lines_from_contour(contour)
             lines_filtered.extend( lines )
         pass
 
@@ -617,24 +617,55 @@ class Image (Common) :
     pass  # -- filter lines only
 
     @profile
-    def filter_lines_from_polyline(self, polyline):
+    def filter_lines_from_contour(self, contour_org):
         lines = []
 
         idx_fr = 0
         idx_to = 0
-        poly_len = len( polyline )
+        poly_len = len(contour_org)
+
+        # if cv2.isContourConvex(cnt) == True:
 
         is_good = True
+        i = 0
         while is_good :
             idx_to += 1
+
+            sub_contour = contour_org[idx_fr: idx_to + 1]
+
+            area = cv.contourArea(sub_contour)
+            perimeter = cv.arcLength(sub_contour, True)
+
+            log.info(f"[{(i + 1):03d}] area = {area}, perimeter = {perimeter}")
+
+            # Rotated Rectangle
+            min_rect = cv.minAreaRect(sub_contour)
+            min_box = cv.boxPoints(min_rect)
+            min_box = np.int0(min_box)
+
+            text = [", ".join(item) for item in min_box.astype(str)]
+
+            min_box_area = cv2.contourArea(min_box)
+
+            area_width = cv2.norm(min_box[0] - min_box[1], cv2.NORM_L2)
+            area_height = cv2.norm(min_box[1] - min_box[2], cv2.NORM_L2)
+
+            log.info( f"rotated_box = {text}, area = {min_box_area}, width = {area_width: .2f}, height = {area_height: .2f}")
+
+            # Fitting a Line
+            # (ax, ay) is a vector collinear to the line
+            # (x0, y0) is a point on the line.
+            [ax, ay, x0, y0] = cv.fitLine(sub_contour, cv.DIST_L2, 0, 0.001, 0.001)
 
             if idx_to == poly_len :
                 is_good = False
             pass
 
             if not is_good :
-                lines.append( polyline )
+                lines.append(contour_org)
             pass
+
+            i += 1
         pass
 
         return lines
