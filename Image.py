@@ -618,6 +618,8 @@ class Image (Common) :
 
     @profile
     def filter_lines_from_contour(self, contour_org):
+        # 등고선으로부터 직선들만을 추출한다.
+
         lines = []
 
         idx_fr = 0

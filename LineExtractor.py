@@ -248,6 +248,8 @@ class LineExtractor ( Common ):
         useContour = True
         if useContour:
             lineWidth = 1
+            lineWidth = 2
+
             contours = curr_image.extract_contours()
             contours_image = curr_image.draw_contours(contours, lineWidth=lineWidth)
             contours_image.save_img_as_file(img_path, contours_image.algorithm)
@@ -256,9 +258,11 @@ class LineExtractor ( Common ):
             contours_image = contours_image.draw_contours(contours, lineWidth=lineWidth)
             contours_image.save_img_as_file(img_path, contours_image.algorithm + "_filtered")
 
-            lines = contours_image.filter_lines_only( contours )
-            contours_image = contours_image.draw_contours(lines, lineWidth=lineWidth)
-            contours_image.save_img_as_file(img_path, contours_image.algorithm + "_lines_only")
+            if 0 :
+                lines = contours_image.filter_lines_only( contours )
+                contours_image = contours_image.draw_contours(lines, lineWidth=lineWidth)
+                contours_image.save_img_as_file(img_path, contours_image.algorithm + "_lines_only")
+            pass
 
             curr_image = contours_image
 
@@ -317,12 +321,14 @@ if __name__ == '__main__':
     files = []
 
     img_path = "./data_yegan/set_01/_1018843.JPG"
-    img_path = "./data_yegan/set_06/data4.JPG"
-    #img_path = "./data_yegan/set_04/P1010015.JPG"
+        #img_path = "./data_yegan/set_04/P1010015.JPG"
     img_path = "./data_yegan/set_04"
     img_path = "./data_yegan/set_05"
 
     #img_path = "./data_yegan/set_01"
+    img_path = "./data_yegan/set_06/data4.JPG"
+    img_path = "./data_yegan/set_06/DJI_0146.JPG"
+    img_path = "./data_yegan/set_06/IMG_0129.JPG"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)
