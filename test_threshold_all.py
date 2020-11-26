@@ -1,7 +1,6 @@
 # coding: utf-8
 
-from skimage import data
-from skimage import io
+from skimage import data, io
 #from skimage.filters import try_all_threshold
 from my_skimage.thresholding import try_all_threshold
 from skimage.color import rgb2gray
@@ -11,6 +10,7 @@ import matplotlib.pyplot as plt
 image = data.text()
 image = data.page()
 image = data.camera()
+image = page()
 image = data.stereo_motorcycle()[0]
 
 image = data.astronaut()

@@ -18,7 +18,6 @@ next_img_path = common.next_file( img_path )
 img2 = cv2.imread( next_img_path , 1) # trainImage
 gray2 = cv2.cvtColor( img2, cv2.COLOR_BGR2GRAY)
 
-
 # Initiate SIFT detector
 sift = cv2.SIFT_create()
 
