@@ -321,7 +321,7 @@ if __name__ == '__main__':
     files = []
 
     img_path = "./data_yegan/set_01/_1018843.JPG"
-        #img_path = "./data_yegan/set_04/P1010015.JPG"
+    img_path = "./data_yegan/set_04/P1010015.JPG"
     img_path = "./data_yegan/set_04"
     img_path = "./data_yegan/set_05"
 

@@ -20,7 +20,7 @@ log.info( f"next_img_path = {next_img_path}" )
 img_2 = cv2.imread(next_img_path, 0) # trainImage
 
 # Initiate SIFT detector
-sift = cv2.xfeatures2d.SIFT_create()
+sift = cv2.SIFT_create()
 
 # find the keypoints and descriptors with SIFT
 kp1, des1 = sift.detectAndCompute(img_1, None)
