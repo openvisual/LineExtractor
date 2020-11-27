@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from Common import *
-from Image import Image
 import cv2, cv2 as cv
 
+from Common import *
+from Image import Image
 from skimage import filters
 
-class Threshold(Common) :
+class Threshold(Common):
 
     def __init__(self, image ):
         self.image = image
