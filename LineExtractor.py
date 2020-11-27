@@ -195,6 +195,7 @@ class LineExtractor ( Common ):
             #algorithm = "yen"
             #algorithm = "balanced"
             algorithm = "adaptive_gaussian"
+            algorithm = "sauvola"
             #algorithm = "adaptive_mean"
             #algorithm = "global"
 
@@ -323,12 +324,13 @@ if __name__ == '__main__':
     img_path = "./data_yegan/set_01/_1018843.JPG"
     img_path = "./data_yegan/set_04/P1010015.JPG"
     img_path = "./data_yegan/set_04"
-    img_path = "./data_yegan/set_05"
 
     #img_path = "./data_yegan/set_01"
     img_path = "./data_yegan/set_06/data4.JPG"
     img_path = "./data_yegan/set_06/DJI_0146.JPG"
     img_path = "./data_yegan/set_06/IMG_0129.JPG"
+
+    img_path = "./data_yegan/set_05"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)

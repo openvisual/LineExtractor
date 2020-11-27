@@ -5,6 +5,7 @@ import cv2, cv2 as cv
 from Common import *
 from Image import Image
 from skimage import filters
+from skimage.filters import threshold_sauvola
 
 class Threshold(Common):
 
@@ -35,6 +36,8 @@ class Threshold(Common):
             v = self.threshold_isodata()
         elif "balanced" in algorithm:
             v = self.threshold_balanced()
+        elif "sauvola" in algorithm:
+            v = self.threshold_sauvola()
         pass
 
         return v
@@ -145,6 +148,25 @@ class Threshold(Common):
 
         return image
     pass  # -- threshold_balanced
+
+    @profile
+    def threshold_sauvola(self):
+        log.info(inspect.getframeinfo(inspect.currentframe()).function)
+
+        image = self.image
+
+        img = image.img
+
+        win_size = 25
+        thresh_sauvola = threshold_sauvola(img, window_size=win_size)
+
+        data = img > thresh_sauvola
+
+        image = Image(data)
+        image.algorithm = f"threshold sauvola(win_size={win_size})"
+
+        return image
+    pass  # -- threshold sauvola
 
     @profile
     def threshold_li(self ):
