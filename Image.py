@@ -774,9 +774,9 @@ class Image (Common) :
 
     @profile
     def threshold(self, algorithm, thresh=None, bsize=None, c=None):
-        import Threshold
+        import ImageThreshold
 
-        threshold = Threshold.Threshold( image = self )
+        threshold = ImageThreshold.Threshold(image = self)
 
         return threshold.threshold( algorithm = algorithm, thresh=thresh, bsize=bsize, c=c )
     pass # -- threshold
