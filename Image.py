@@ -600,13 +600,10 @@ class Image (Common) :
         h = len(img)
         w = len(img[0])
 
-        ref_len = max(w, h) * 0.1
-
-        ref_width = min(w, h) / 30
-        ref_height = ref_width
+        min_width = max(w, h) // 1_000
 
         for i, contour in enumerate(contours):
-            lines = self.filter_lines_from_contour(contour)
+            lines = self.filter_lines_from_contour(contour, min_width)
             lines_filtered.extend( lines )
         pass
 
@@ -617,28 +614,35 @@ class Image (Common) :
     pass  # -- filter lines only
 
     @profile
-    def filter_lines_from_contour(self, contour_org):
+    def filter_lines_from_contour(self, contour_org, min_width=4):
         # 등고선으로부터 직선들만을 추출한다.
+
+        if contour_org[0] == contour_org[-1] :
+            contour_org == contour_org[ 0 : - 1 ]
+        pass
 
         lines = []
 
-        idx_fr = 0
-        idx_to = 0
         poly_len = len(contour_org)
 
-        # if cv2.isContourConvex(cnt) == True:
+        idx_fr = 0
+        idx_to = poly_len
 
-        is_good = True
+        if cv2.isContourConvex( contour_org ) :
+            pass
+        pass
+
+        is_line = False
+
         i = 0
-        while is_good :
-            idx_to += 1
 
-            sub_contour = contour_org[idx_fr: idx_to + 1]
+        while idx_fr < poly_len :
+            sub_contour = contour_org[ idx_fr : idx_to ]
 
-            area = cv.contourArea(sub_contour)
-            perimeter = cv.arcLength(sub_contour, True)
+            arc_area = cv.contourArea(sub_contour)
+            arc_perimeter = cv.arcLength(sub_contour, False)
 
-            log.info(f"[{(i + 1):03d}] area = {area}, perimeter = {perimeter}")
+            log.info(f"[{(i + 1):03d}] arc_area = {arc_area}, arc_perimeter = {arc_perimeter}")
 
             # Rotated Rectangle
             min_rect = cv.minAreaRect(sub_contour)
@@ -652,23 +656,37 @@ class Image (Common) :
             area_width = cv2.norm(min_box[0] - min_box[1], cv2.NORM_L2)
             area_height = cv2.norm(min_box[1] - min_box[2], cv2.NORM_L2)
 
+            line_length = max( area_width, area_height )
+
             log.info( f"rotated_box = {text}, area = {min_box_area}, width = {area_width: .2f}, height = {area_height: .2f}")
+
+            if ( arc_perimeter - line_length )/arc_perimeter < 0.02 :
+                # 아크 길이와 직선 길이의 비율이 2% 미만이면, 직선으로 판변한다.
+                is_line = True
+            else :
+                is_line = False
+            pass
 
             # Fitting a Line
             # (ax, ay) is a vector collinear to the line
             # (x0, y0) is a point on the line.
             [ax, ay, x0, y0] = cv.fitLine(sub_contour, cv.DIST_L2, 0, 0.001, 0.001)
 
-            if idx_to == poly_len :
-                is_good = False
-            pass
+            idx_fr_prev = idx_fr
+            idx_to_prev = idx_to
 
-            if not is_good :
-                lines.append(contour_org)
+            if not is_line : # 직선이 안 뽑아지면,
+                idx_to = ( idx_fr + idx_to ) // 2
+            elif is_line : # 직선이 뽑아지면,
+
+                lines.append( sub_contour )
+
+                idx_fr = idx_to + 1
+                idx_to = poly_len * 2
             pass
 
             i += 1
-        pass
+        pass # -- while
 
         return lines
     pass
