@@ -676,9 +676,13 @@ class Image (Common) :
             idx_to_prev = idx_to
 
             if not is_line : # 직선이 안 뽑아지면,
-                idx_to = ( idx_fr + idx_to ) // 2
+                if idx_to - idx_fr == 1 :
+                    idx_fr += 1
+                    idx_to = poly_len
+                else :
+                    idx_to = ( idx_fr + idx_to ) // 2
+                pass
             elif is_line : # 직선이 뽑아지면,
-
                 lines.append( sub_contour )
 
                 idx_fr = idx_to + 1
