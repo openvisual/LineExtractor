@@ -319,9 +319,6 @@ if __name__ == '__main__':
 
     files = []
 
-    img_path = "./data_yegan/set_01/_1018843.JPG"
-    img_path = "./data_yegan/set_04/P1010015.JPG"
-
     #img_path = "./data_yegan/set_01"
     img_path = "./data_yegan/set_06/data4.JPG"
     img_path = "./data_yegan/set_06/DJI_0146.JPG"
@@ -329,6 +326,9 @@ if __name__ == '__main__':
 
     img_path = "./data_yegan/set_05"
     img_path = "./data_yegan/set_04"
+
+    img_path = "./data_yegan/set_04/P1010015.JPG"
+    img_path = "./data_yegan/set_01/_1018843.JPG"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)

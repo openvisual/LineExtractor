@@ -614,30 +614,27 @@ class Image (Common) :
     pass  # -- filter lines only
 
     @profile
-    def filter_lines_from_contour(self, contour_org, min_width=4):
+    def filter_lines_from_contour(self, contour, min_width=4):
         # 등고선으로부터 직선들만을 추출한다.
 
-        if contour_org[0] == contour_org[-1] :
-            contour_org == contour_org[ 0 : - 1 ]
+        if contour[0] == contour[-1] :
+            contour == contour[0: - 1]
         pass
 
         lines = []
 
-        poly_len = len(contour_org)
-
-        idx_fr = 0
-        idx_to = poly_len
-
-        if cv2.isContourConvex( contour_org ) :
-            pass
-        pass
-
-        is_line = False
+        idx_to = None
+        line_idx_to = None
 
         i = 0
 
-        while idx_fr < poly_len :
-            sub_contour = contour_org[ idx_fr : idx_to ]
+        while idx_to is None or idx_to <= len(contour) :
+            if idx_to is None :
+                idx_to = len(contour)
+                line_idx_to = None
+            pass
+
+            sub_contour = contour[ 0 : idx_to ]
 
             arc_area = cv.contourArea(sub_contour)
             arc_perimeter = cv.arcLength(sub_contour, False)
@@ -672,21 +669,43 @@ class Image (Common) :
             # (x0, y0) is a point on the line.
             [ax, ay, x0, y0] = cv.fitLine(sub_contour, cv.DIST_L2, 0, 0.001, 0.001)
 
-            idx_fr_prev = idx_fr
-            idx_to_prev = idx_to
+            if len(contour) == 1:
+                break
+            elif len(contour) == 2:
+                lines.append(line_extracted)
+            elif not is_line : # 직선이 안 뽑아지면,
+                if line_idx_to is None:
+                    if idx_to <= 1 :
+                        contour = contour[ idx_to : ]
+                        idx_to = None
+                        line_idx_to = None
+                    else:
+                        idx_to = idx_to // 2
+                    pass
+                elif line_idx_to is not None :
+                    if abs( line_idx_to - idx_to ) > 1 :
+                        if idx_to < line_idx_to :
+                            idx_to = (idx_to + line_idx_to ) // 2
+                        else :
+                            idx_to = ( line_idx_to + len( contour ) ) // 2
+                        pass
+                    else :
+                        line_extracted = contour[ 0 : line_idx_to ]
 
-            if not is_line : # 직선이 안 뽑아지면,
-                if idx_to - idx_fr == 1 :
-                    idx_fr += 1
-                    idx_to = poly_len
-                else :
-                    idx_to = ( idx_fr + idx_to ) // 2
+                        lines.append( line_extracted )
+
+                        contour = contour[ line_idx_to : ]
+                        idx_to = None
+                        line_idx_to = None
+                    pass
                 pass
             elif is_line : # 직선이 뽑아지면,
-                lines.append( sub_contour )
+                if line_idx_to is None :
+                    line_idx_to = idx_to
+                elif line_idx_to is not None :
+                    if idx_to < line_idx_to :
 
-                idx_fr = idx_to + 1
-                idx_to = poly_len * 2
+                pass
             pass
 
             i += 1
