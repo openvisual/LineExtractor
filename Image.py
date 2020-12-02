@@ -675,28 +675,27 @@ class Image (Common) :
                 lines.append(line_extracted)
             elif not is_line : # 직선이 안 뽑아지면,
                 if line_idx_to is None:
+                    # 전 직선이 없으면
                     if idx_to <= 1 :
-                        contour = contour[ idx_to : ]
+                        contour = contour[ 1 : ]
                         idx_to = None
                         line_idx_to = None
                     else:
                         idx_to = idx_to // 2
                     pass
                 elif line_idx_to is not None :
-                    if abs( line_idx_to - idx_to ) > 1 :
-                        if idx_to < line_idx_to :
-                            idx_to = (idx_to + line_idx_to ) // 2
-                        else :
-                            idx_to = ( line_idx_to + len( contour ) ) // 2
-                        pass
-                    else :
-                        line_extracted = contour[ 0 : line_idx_to ]
+                    # 전 직선이 있으면,
+                    if line_idx_to == idx_to - 1 :
+                        # 전 직선 인덱스와 인접한 경우,
+                        line_extracted = contour[0: line_idx_to]
 
-                        lines.append( line_extracted )
+                        lines.append(line_extracted)
 
-                        contour = contour[ line_idx_to : ]
+                        contour = contour[line_idx_to:]
                         idx_to = None
                         line_idx_to = None
+                    else :
+                        idx_to = ( idx_to + line_idx_to ) // 2
                     pass
                 pass
             elif is_line : # 직선이 뽑아지면,
@@ -704,7 +703,6 @@ class Image (Common) :
                     line_idx_to = idx_to
                 elif line_idx_to is not None :
                     if idx_to < line_idx_to :
-
                 pass
             pass
 
