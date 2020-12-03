@@ -79,12 +79,11 @@ for i, contour in enumerate(contours):
 
     d = sqrt( ax*ax + ay*ay )
 
-    b = y0 - a * x0
     x1 = 0
-    y1 = int( b )
+    y1 = int( y0 + a * (x1 - x0) )
 
     x2 = width - 1
-    y2 = int( y0 + a * (width - 1 - x0) )
+    y2 = int( y0 + a * (x2 - x0) )
 
     cv.line(img, (x1, y1), ( x2, y2), (255, 255, 0), 2, cv.LINE_AA)
 
@@ -92,15 +91,15 @@ for i, contour in enumerate(contours):
 
     box_length = max( area_width, area_height )
 
-    x1 = x0 + (box_length / 2) * ax / d
-    y1 = y0 + (box_length / 2) * ay / d
+    x1 = min_box[0][0]
+    y1 = int(y0 + a * (x1 - x0))
 
     cv.circle(img, (int(x1), int(y1)), 5, (0, 255, 255), 2, cv.LINE_AA)
 
-    x2 = x0 - (box_length / 2) * ax / d
-    y2 = y0 - (box_length / 2) * ay / d
+    x1 = min_box[1][0]
+    y1 = int(y0 + a * (x1 - x0))
 
-    cv.circle(img, (int(x2), int(y2)), 5, (255, 0, 0), 2, cv.LINE_AA)
+    cv.circle(img, (int(x1), int(y1)), 5, (255, 0, 0), 2, cv.LINE_AA)
 pass
 
 plt.imshow( img )
