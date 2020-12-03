@@ -600,7 +600,7 @@ class Image (Common) :
         h = len(img)
         w = len(img[0])
 
-        min_length = max(w, h) // 50
+        min_length = max(w, h) // 20
         min_length = max( min_length, 5 )
 
         for i, contour in enumerate(contours):
@@ -684,7 +684,7 @@ class Image (Common) :
             if len(contour) <= 1:
                 break
             elif len(contour) == 2:
-                if arc_perimeter > min_length :
+                if 0 and line_length > min_length :
                     line_extracted = contour
                     lines.append( line_extracted )
                 pass
@@ -717,7 +717,7 @@ class Image (Common) :
                 pass
             elif is_line : # 직선이 뽑아지면,
                 if idx_to == len( contour ) :
-                    line_extracted = contour[0: line_idx_to]
+                    line_extracted = contour
                     lines.append(line_extracted)
                     break
                 elif abs( curve_idx_to - idx_to ) <= 1 :
