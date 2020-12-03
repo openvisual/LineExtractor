@@ -642,8 +642,9 @@ class Image (Common) :
             if len(contour) <= 1:
                 break
             elif len(contour) == 2:
-                if line_length > min_length :
-                    line_extracted = contour
+                line_extracted = contour
+
+                if cv.arcLength(line_extracted, False) > min_length :
                     lines.append( line_extracted )
                 pass
 
@@ -709,7 +710,9 @@ class Image (Common) :
                         # 전 직선 인덱스와 인접한 경우,
                         line_extracted = contour[ 0: line_idx_to ]
 
-                        lines.append(line_extracted)
+                        if cv.arcLength(line_extracted, False) > min_length:
+                            lines.append(line_extracted)
+                        pass
 
                         contour = contour[ line_idx_to : ]
                         idx_to = None
@@ -720,11 +723,18 @@ class Image (Common) :
             elif is_line : # 직선이 뽑아지면,
                 if idx_to == len( contour ) :
                     line_extracted = contour
-                    lines.append(line_extracted)
+
+                    if cv.arcLength(line_extracted, False) > min_length:
+                        lines.append(line_extracted)
+                    pass
+
                     break
                 elif abs( curve_idx_to - idx_to ) <= 1 :
                     line_extracted = contour[0: idx_to ]
-                    lines.append( line_extracted )
+
+                    if cv.arcLength(line_extracted, False) > min_length:
+                        lines.append(line_extracted)
+                    pass
 
                     contour = contour[ idx_to : ]
                     idx_to = None
