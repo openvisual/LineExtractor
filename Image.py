@@ -600,10 +600,11 @@ class Image (Common) :
         h = len(img)
         w = len(img[0])
 
-        min_width = max(w, h) // 1_000
+        min_length = max(w, h) // 50
+        min_length = max( min_length, 5 )
 
         for i, contour in enumerate(contours):
-            lines = self.filter_lines_from_contour(contour, min_width)
+            lines = self.filter_lines_from_contour(contour, min_length)
             lines_filtered.extend( lines )
         pass
 
@@ -614,32 +615,36 @@ class Image (Common) :
     pass  # -- filter lines only
 
     @profile
-    def filter_lines_from_contour(self, contour, min_width=4):
+    def filter_lines_from_contour(self, contour, min_length=10):
         # 등고선으로부터 직선들만을 추출한다.
 
-        if contour[0] == contour[-1] :
-            contour == contour[0: - 1]
-        pass
+        debug = False
 
         lines = []
 
         idx_to = None
         line_idx_to = None
+        curve_idx_to = None
+        is_line = False
 
         i = 0
 
         while idx_to is None or idx_to <= len(contour) :
             if idx_to is None :
                 idx_to = len(contour)
+                curve_idx_to = len(contour)
                 line_idx_to = None
+                is_line = False
             pass
+
+            log.info(f"[{(i + 1):03d}] poly_len={len(contour)}, idx_to = {idx_to}, curve_idx_to = {curve_idx_to}, line_idx_to = {line_idx_to}, is_line={is_line}")
 
             sub_contour = contour[ 0 : idx_to ]
 
             arc_area = cv.contourArea(sub_contour)
             arc_perimeter = cv.arcLength(sub_contour, False)
 
-            log.info(f"[{(i + 1):03d}] arc_area = {arc_area}, arc_perimeter = {arc_perimeter}")
+            debug and log.info(f"[{(i + 1):03d}] arc_area = {arc_area}, arc_perimeter = {arc_perimeter}")
 
             # Rotated Rectangle
             min_rect = cv.minAreaRect(sub_contour)
@@ -655,54 +660,80 @@ class Image (Common) :
 
             line_length = max( area_width, area_height )
 
-            log.info( f"rotated_box = {text}, area = {min_box_area}, width = {area_width: .2f}, height = {area_height: .2f}")
+            debug and log.info( f"rotated_box = {text}, area = {min_box_area}, width = {area_width: .2f}, height = {area_height: .2f}")
 
-            if ( arc_perimeter - line_length )/arc_perimeter < 0.02 :
-                # 아크 길이와 직선 길이의 비율이 2% 미만이면, 직선으로 판변한다.
-                is_line = True
-            else :
+            if arc_perimeter == 0 :
                 is_line = False
+            else:
+                if ( arc_perimeter - line_length )/arc_perimeter < 0.02 :
+                    # 아크 길이와 직선 길이의 비율이 2% 미만이면, 직선으로 판변한다.
+                    is_line = True
+                else :
+                    is_line = False
+                pass
             pass
 
-            # Fitting a Line
-            # (ax, ay) is a vector collinear to the line
-            # (x0, y0) is a point on the line.
-            [ax, ay, x0, y0] = cv.fitLine(sub_contour, cv.DIST_L2, 0, 0.001, 0.001)
+            do_fitting = False
+            if do_fitting :
+                # Fitting a Line
+                # (ax, ay) is a vector collinear to the line
+                # (x0, y0) is a point on the line.
+                [ax, ay, x0, y0] = cv.fitLine(sub_contour, cv.DIST_L2, 0, 0.001, 0.001)
+            pass
 
-            if len(contour) == 1:
+            if len(contour) <= 1:
                 break
             elif len(contour) == 2:
-                lines.append(line_extracted)
+                if arc_perimeter > min_length :
+                    line_extracted = contour
+                    lines.append( line_extracted)
+                pass
+
+                break
             elif not is_line : # 직선이 안 뽑아지면,
+                curve_idx_to = idx_to
+
                 if line_idx_to is None:
                     # 전 직선이 없으면
                     if idx_to <= 1 :
                         contour = contour[ 1 : ]
                         idx_to = None
-                        line_idx_to = None
                     else:
                         idx_to = idx_to // 2
                     pass
                 elif line_idx_to is not None :
                     # 전 직선이 있으면,
-                    if line_idx_to == idx_to - 1 :
+                    if abs( line_idx_to - idx_to ) <= 1 :
                         # 전 직선 인덱스와 인접한 경우,
-                        line_extracted = contour[0: line_idx_to]
+                        line_extracted = contour[ 0: line_idx_to ]
 
                         lines.append(line_extracted)
 
-                        contour = contour[line_idx_to:]
+                        contour = contour[ line_idx_to : ]
                         idx_to = None
-                        line_idx_to = None
                     else :
                         idx_to = ( idx_to + line_idx_to ) // 2
                     pass
                 pass
             elif is_line : # 직선이 뽑아지면,
-                if line_idx_to is None :
-                    line_idx_to = idx_to
-                elif line_idx_to is not None :
-                    if idx_to < line_idx_to :
+                if idx_to == len( contour ) :
+                    line_extracted = contour[0: line_idx_to]
+                    lines.append(line_extracted)
+                    break
+                elif abs( curve_idx_to - idx_to ) <= 1 :
+                    line_extracted = contour[0: line_idx_to]
+                    lines.append(line_extracted)
+
+                    contour = contour[ line_idx_to : ]
+                    idx_to = None
+                else :
+                    if line_idx_to is None :
+                        line_idx_to = idx_to
+                        idx_to = (idx_to + curve_idx_to) // 2
+                    elif line_idx_to is not None :
+                        line_idx_to = idx_to
+                        idx_to = ( idx_to + curve_idx_to ) // 2
+                    pass
                 pass
             pass
 
@@ -710,7 +741,7 @@ class Image (Common) :
         pass # -- while
 
         return lines
-    pass
+    pass # -- filter_lines_from_contour
 
     @profile
     def draw_contours(self, contours, lineWidth = 1):
