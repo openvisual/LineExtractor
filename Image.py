@@ -712,7 +712,7 @@ class Image (Common) :
                         contour = contour[ line_idx_to : ]
                         idx_to = None
                     else :
-                        idx_to = ( idx_to + line_idx_to ) // 2
+                        idx_to = ( line_idx_to + idx_to ) // 2
                     pass
                 pass
             elif is_line : # 직선이 뽑아지면,
@@ -721,10 +721,10 @@ class Image (Common) :
                     lines.append(line_extracted)
                     break
                 elif abs( curve_idx_to - idx_to ) <= 1 :
-                    line_extracted = contour[0: line_idx_to]
-                    lines.append(line_extracted)
+                    line_extracted = contour[0: idx_to ]
+                    lines.append( line_extracted )
 
-                    contour = contour[ line_idx_to : ]
+                    contour = contour[ idx_to : ]
                     idx_to = None
                 else :
                     if line_idx_to is None :
