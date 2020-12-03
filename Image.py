@@ -7,6 +7,9 @@ import os, numpy as np, sys, time, math, inspect
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from functools import cmp_to_key
+from shapely import geometry
+from shapely.geometry import LineString
+from shapely.ops import nearest_points
 
 import cv2, cv2 as cv
 from skimage import filters
@@ -604,7 +607,7 @@ class Image (Common) :
         min_length = max( min_length, 5 )
 
         for i, contour in enumerate(contours):
-            lines = self.filter_lines_from_contour(contour, min_length)
+            lines = self.filter_lines_from_contour(contour, min_length, w)
             lines_filtered.extend( lines )
         pass
 
@@ -614,23 +617,61 @@ class Image (Common) :
 
     pass  # -- filter lines only
 
-    def _append_lines_after_fitting(self, lines, line_extracted, min_length ):
-        do_fitting = False
-
-        if do_fitting:
-            # Fitting a Line
-            # (ax, ay) is a vector collinear to the line
-            # (x0, y0) is a point on the line.
-            [ax, ay, x0, y0] = cv.fitLine(line_extracted, cv.DIST_L2, 0, 0.001, 0.001)
-        pass
+    def _append_lines_after_fitting(self, lines, line_extracted, min_length, img_width ):
 
         if cv.arcLength(line_extracted, False) > min_length:
+            # Fitting a Line
+            # (ax, ay) is a vector collinear to the line
+            # (x0, y0) is a point on the line
+
+            [ax, ay, x0, y0] = cv.fitLine(line_extracted, cv.DIST_L2, 0, 0.001, 0.001)
+
+            # Rotated Rectangle
+            min_rect = cv.minAreaRect( line_extracted )
+            min_box = cv.boxPoints( min_rect )
+            min_box = np.int0(min_box)
+
+            x1 = 0
+            y1 = int(y0 + (ay / ax) * (x1 - x0)) if ax else y0
+
+            x2 = img_width - 1
+            y2 = int(y0 + (ay / ax) * (x2 - x0)) if ax else y0
+
+            line = LineString([(x1, y1), (x2, y2)])
+
+            p = min_box[0]
+
+            for q in min_box:
+                if q[0] < p[0]:
+                    p = q
+                pass
+            pass
+
+            #log.info( f"px = {p[0]}, py = {p[1]}" )
+
+            pp = geometry.Point(p[0], p[1])
+            p0 = nearest_points(line, pp)[0]
+
+            p = min_box[0]
+
+            for q in min_box:
+                if q[0] > p[0]:
+                    p = q
+                pass
+            pass
+
+            pp = geometry.Point(p[0], p[1])
+            p1 = nearest_points(line, pp)[0]
+
+            line_extracted = np.array( [ [ [ int(p0.x), int(p0.y)] ], [ [ int(p1.x), int(p1.y) ] ]] )
+
             lines.append(line_extracted)
         pass
+
     pass
 
     @profile
-    def filter_lines_from_contour(self, contour, min_length=10):
+    def filter_lines_from_contour(self, contour, min_length=10, img_width = 100 ):
         # 등고선으로부터 직선들만을 추출한다.
 
         debug = False
@@ -744,7 +785,7 @@ class Image (Common) :
             pass
 
             if line_extracted is not None :
-                self._append_lines_after_fitting(lines, line_extracted, min_length)
+                self._append_lines_after_fitting(lines, line_extracted, min_length, img_width)
             pass
 
             if exit_while :

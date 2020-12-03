@@ -273,10 +273,10 @@ class LineExtractor ( Common ):
             curr_image = contours_image
 
             curr_image.plot_image(title=curr_image.algorithm, border_color="blue", qtUi=qtUi, mode=mode)
-            curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass
 
-        if useHoughLine : # 허프 라인 추출
+        if useHoughLine :
+            # 허프 라인 추출
             lineList = curr_image.extract_lines( merge_lines=0, img_path=img_path )
             hough = curr_image.plot_lines( lineList )
             hough.save_img_as_file(img_path, hough.algorithm)
