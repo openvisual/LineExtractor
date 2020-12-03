@@ -639,6 +639,17 @@ class Image (Common) :
 
             log.info(f"[{(i + 1):03d}] poly_len={len(contour)}, idx_to = {idx_to}, curve_idx_to = {curve_idx_to}, line_idx_to = {line_idx_to}, is_line={is_line}")
 
+            if len(contour) <= 1:
+                break
+            elif len(contour) == 2:
+                if line_length > min_length :
+                    line_extracted = contour
+                    lines.append( line_extracted )
+                pass
+
+                break
+            pass
+
             sub_contour = contour[ 0 : idx_to ]
 
             arc_area = cv.contourArea(sub_contour)
@@ -681,16 +692,7 @@ class Image (Common) :
                 [ax, ay, x0, y0] = cv.fitLine(sub_contour, cv.DIST_L2, 0, 0.001, 0.001)
             pass
 
-            if len(contour) <= 1:
-                break
-            elif len(contour) == 2:
-                if 0 and line_length > min_length :
-                    line_extracted = contour
-                    lines.append( line_extracted )
-                pass
-
-                break
-            elif not is_line : # 직선이 안 뽑아지면,
+            if not is_line : # 직선이 안 뽑아지면,
                 curve_idx_to = idx_to
 
                 if line_idx_to is None:
@@ -729,10 +731,10 @@ class Image (Common) :
                 else :
                     if line_idx_to is None :
                         line_idx_to = idx_to
-                        idx_to = (idx_to + curve_idx_to) // 2
+                        idx_to = (line_idx_to + curve_idx_to) // 2
                     elif line_idx_to is not None :
                         line_idx_to = idx_to
-                        idx_to = ( idx_to + curve_idx_to ) // 2
+                        idx_to = (line_idx_to + curve_idx_to) // 2
                     pass
                 pass
             pass
