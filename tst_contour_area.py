@@ -6,7 +6,7 @@ log.basicConfig( format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)04d]
 import cv2, cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-
+from math import sqrt
 
 img = cv.imread('./data/star.jpg', 1)
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -54,6 +54,8 @@ for i, contour in enumerate(contours):
     min_box = cv.boxPoints( min_rect )
     min_box = np.int0(min_box)
 
+    center = np.mean( min_box, axis=0 )
+
     text = [ ", ".join( item ) for item in min_box.astype(str) ]
 
     min_box_area = cv2.contourArea(min_box)
@@ -69,11 +71,13 @@ for i, contour in enumerate(contours):
     # (x0, y0) is a point on the line.
     [ax, ay, x0, y0] = cv.fitLine(contour, cv.DIST_L2, 0, 0.001, 0.001)
 
-    log.info(f"fitLine: ax = {ax}, ay = {ay}, x0 = {x0}, y0 = {y0}")
+    log.info( f"fitLine: ax = {ax}, ay = {ay}, x0 = {x0}, y0 = {y0}")
 
     _, width = img.shape[:2]
 
     a = ay/ax
+
+    d = sqrt( ax*ax + ay*ay )
 
     b = y0 - a * x0
     x1 = 0
@@ -83,6 +87,20 @@ for i, contour in enumerate(contours):
     y2 = int( y0 + a * (width - 1 - x0) )
 
     cv.line(img, (x1, y1), ( x2, y2), (255, 255, 0), 2, cv.LINE_AA)
+
+    cv.circle(img, (int(x0), int(y0) ), 5, (255, 0, 255), 2, cv.LINE_AA)
+
+    box_length = max( area_width, area_height )
+
+    x1 = x0 + (box_length / 2) * ax / d
+    y1 = y0 + (box_length / 2) * ay / d
+
+    cv.circle(img, (int(x1), int(y1)), 5, (0, 255, 255), 2, cv.LINE_AA)
+
+    x2 = x0 - (box_length / 2) * ax / d
+    y2 = y0 - (box_length / 2) * ay / d
+
+    cv.circle(img, (int(x2), int(y2)), 5, (255, 0, 0), 2, cv.LINE_AA)
 pass
 
 plt.imshow( img )
