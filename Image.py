@@ -615,6 +615,15 @@ class Image (Common) :
     pass  # -- filter lines only
 
     def _append_lines_after_fitting(self, lines, line_extracted, min_length ):
+        do_fitting = False
+
+        if do_fitting:
+            # Fitting a Line
+            # (ax, ay) is a vector collinear to the line
+            # (x0, y0) is a point on the line.
+            [ax, ay, x0, y0] = cv.fitLine(line_extracted, cv.DIST_L2, 0, 0.001, 0.001)
+        pass
+
         if cv.arcLength(line_extracted, False) > min_length:
             lines.append(line_extracted)
         pass
@@ -647,7 +656,7 @@ class Image (Common) :
                 exit_while = False
             pass
 
-            log.info(f"[{(i + 1):03d}] poly_len={len(contour)}, idx_to = {idx_to}, curve_idx_to = {curve_idx_to}, line_idx_to = {line_idx_to}, is_line={is_line}")
+            debug and log.info(f"[{(i + 1):03d}] poly_len={len(contour)}, idx_to = {idx_to}, curve_idx_to = {curve_idx_to}, line_idx_to = {line_idx_to}, is_line={is_line}")
 
             sub_contour = contour[ 0 : idx_to ]
 
@@ -676,20 +685,12 @@ class Image (Common) :
             if arc_perimeter == 0 :
                 is_line = False
             else:
-                if ( arc_perimeter - line_length )/arc_perimeter < 0.02 :
+                if ( arc_perimeter - line_length )/arc_perimeter < 0.03 :
                     # 아크 길이와 직선 길이의 비율이 2% 미만이면, 직선으로 판변한다.
                     is_line = True
                 else :
                     is_line = False
                 pass
-            pass
-
-            do_fitting = False
-            if do_fitting :
-                # Fitting a Line
-                # (ax, ay) is a vector collinear to the line
-                # (x0, y0) is a point on the line.
-                [ax, ay, x0, y0] = cv.fitLine(sub_contour, cv.DIST_L2, 0, 0.001, 0.001)
             pass
 
             if len(contour) <= 1:
