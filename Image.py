@@ -759,7 +759,7 @@ class Image (Common) :
         # 3 channel image for line drawing width color
         data = np.zeros( [h, w, 3], dtype="uint8")
 
-        cv2.drawContours(data, contours, -1, (255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
+        cv2.drawContours(data, contours, contourIdx=-1, color=(255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA )
 
         gray = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
 
@@ -769,6 +769,32 @@ class Image (Common) :
 
         return Image( img=data, algorithm=algorithm )
     pass  # -- draw_contours
+
+    @profile
+    def draw_polylines(self, polylines, lineWidth=1):
+        debug = False
+
+        img = self.img
+
+        img = img.astype(np.uint8)
+
+        h = len(img)
+        w = len(img[0])
+
+        # 3 channel image for line drawing width color
+        data = np.zeros([h, w, 3], dtype="uint8")
+
+        cv2.polylines(data, polylines, isClosed=False, color=(255, 255, 255), thickness=lineWidth, lineType=cv2.LINE_AA)
+
+        gray = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+
+        _, data = cv.threshold(gray, 127, 255, cv.THRESH_BINARY)
+
+        algorithm = "contours"
+
+        return Image(img=data, algorithm=algorithm)
+
+    pass  # -- draw_polylines
 
     @profile
     def remove_noise(self, algorithm , bsize=5 , sigmaColor=75, sigmaSpace=75):
