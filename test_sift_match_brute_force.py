@@ -11,6 +11,8 @@ common = Common()
 img_path = "./data_yegan/set_01/_1018864.JPG"
 img_path = "./data_line/shapes_and_colors 01.png"
 
+img_path = "./data_yegan/set_00/01_left.jpg"
+
 img1 = cv2.imread( img_path, 1)          # queryImage
 gray1 = cv2.cvtColor( img1, cv2.COLOR_BGR2GRAY)
 

@@ -3,7 +3,7 @@
 import logging as log
 log.basicConfig( format='%(asctime)s, %(levelname)-8s [%(filename)s:%(lineno)04d] %(message)s', datefmt='%Y-%m-%d:%H:%M:%S', level=log.INFO )
 
-import cv2
+import cv2, cv2 as cv
 from matplotlib import pyplot as plt
 
 from Common import *
@@ -11,6 +11,8 @@ from Common import *
 common = Common()
 
 img_path = "./data_yegan/set_01/_1018843.JPG"
+img_path = "./data_yegan/set_00/01_left.jpg"
+
 log.info( f"img_path = {img_path}" )
 
 img_1 = cv2.imread(img_path, 0)
@@ -81,5 +83,10 @@ draw_params = dict(matchColor = (255, 0, 0), singlePointColor = (0, 0, 255),
 
 img3 = cv2.drawMatchesKnn(img_1, kp1, img_2, kp2, goods, None, **draw_params)
 
-plt.imshow(img3)
-plt.show()
+cv.imwrite('sift_match_flann.jpg', img3)
+
+cv.imshow("SIFT MATCH", img3)
+
+cv.waitKey(0)
+
+cv.destroyAllWindows()
