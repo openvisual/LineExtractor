@@ -246,7 +246,9 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass  # -- canny
 
+        lineList = None
         useContour = True
+        useHoughLine = True
         if useContour:
             lineWidth = 1
             lineWidth = 2
@@ -269,9 +271,7 @@ class LineExtractor ( Common ):
             curr_image.plot_histogram(qtUi=qtUi, mode=mode)
         pass
 
-        lineList = None
-
-        if 1 : # 허프 라인 추출
+        if useHoughLine : # 허프 라인 추출
             lineList = curr_image.extract_lines( merge_lines=0, img_path=img_path )
             hough = curr_image.plot_lines( lineList )
             hough.save_img_as_file(img_path, hough.algorithm)

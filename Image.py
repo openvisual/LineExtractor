@@ -614,6 +614,12 @@ class Image (Common) :
 
     pass  # -- filter lines only
 
+    def _append_lines_after_fitting(self, lines, line_extracted, min_length ):
+        if cv.arcLength(line_extracted, False) > min_length:
+            lines.append(line_extracted)
+        pass
+    pass
+
     @profile
     def filter_lines_from_contour(self, contour, min_length=10):
         # 등고선으로부터 직선들만을 추출한다.
@@ -626,30 +632,22 @@ class Image (Common) :
         line_idx_to = None
         curve_idx_to = None
         is_line = False
+        line_extracted = None
+        exit_while = False
 
         i = 0
 
-        while idx_to is None or idx_to <= len(contour) :
+        while ( not exit_while ) and ( idx_to is None or idx_to <= len(contour) ):
             if idx_to is None :
                 idx_to = len(contour)
                 curve_idx_to = len(contour)
                 line_idx_to = None
                 is_line = False
+                line_extracted = None
+                exit_while = False
             pass
 
             log.info(f"[{(i + 1):03d}] poly_len={len(contour)}, idx_to = {idx_to}, curve_idx_to = {curve_idx_to}, line_idx_to = {line_idx_to}, is_line={is_line}")
-
-            if len(contour) <= 1:
-                break
-            elif len(contour) == 2:
-                line_extracted = contour
-
-                if cv.arcLength(line_extracted, False) > min_length :
-                    lines.append( line_extracted )
-                pass
-
-                break
-            pass
 
             sub_contour = contour[ 0 : idx_to ]
 
@@ -693,7 +691,13 @@ class Image (Common) :
                 [ax, ay, x0, y0] = cv.fitLine(sub_contour, cv.DIST_L2, 0, 0.001, 0.001)
             pass
 
-            if not is_line : # 직선이 안 뽑아지면,
+            if len(contour) <= 1:
+                line_extracted = None
+                exit_while = True
+            elif len(contour) == 2:
+                line_extracted = contour
+                exit_while = True
+            elif not is_line : # 직선이 안 뽑아지면,
                 curve_idx_to = idx_to
 
                 if line_idx_to is None:
@@ -710,10 +714,6 @@ class Image (Common) :
                         # 전 직선 인덱스와 인접한 경우,
                         line_extracted = contour[ 0: line_idx_to ]
 
-                        if cv.arcLength(line_extracted, False) > min_length:
-                            lines.append(line_extracted)
-                        pass
-
                         contour = contour[ line_idx_to : ]
                         idx_to = None
                     else :
@@ -724,17 +724,9 @@ class Image (Common) :
                 if idx_to == len( contour ) :
                     line_extracted = contour
 
-                    if cv.arcLength(line_extracted, False) > min_length:
-                        lines.append(line_extracted)
-                    pass
-
-                    break
+                    exit_while = True
                 elif abs( curve_idx_to - idx_to ) <= 1 :
                     line_extracted = contour[0: idx_to ]
-
-                    if cv.arcLength(line_extracted, False) > min_length:
-                        lines.append(line_extracted)
-                    pass
 
                     contour = contour[ idx_to : ]
                     idx_to = None
@@ -747,6 +739,14 @@ class Image (Common) :
                         idx_to = (line_idx_to + curve_idx_to) // 2
                     pass
                 pass
+            pass
+
+            if line_extracted is not None :
+                self._append_lines_after_fitting(lines, line_extracted, min_length)
+            pass
+
+            if exit_while :
+                break
             pass
 
             i += 1
