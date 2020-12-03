@@ -686,7 +686,7 @@ class Image (Common) :
             elif len(contour) == 2:
                 if arc_perimeter > min_length :
                     line_extracted = contour
-                    lines.append( line_extracted)
+                    lines.append( line_extracted )
                 pass
 
                 break
