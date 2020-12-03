@@ -661,8 +661,6 @@ class Image (Common) :
             min_box = cv.boxPoints(min_rect)
             min_box = np.int0(min_box)
 
-            text = [", ".join(item) for item in min_box.astype(str)]
-
             min_box_area = cv2.contourArea(min_box)
 
             area_width = cv2.norm(min_box[0] - min_box[1], cv2.NORM_L2)
@@ -670,7 +668,10 @@ class Image (Common) :
 
             line_length = max( area_width, area_height )
 
-            debug and log.info( f"rotated_box = {text}, area = {min_box_area}, width = {area_width: .2f}, height = {area_height: .2f}")
+            if debug :
+                text = [", ".join(item) for item in min_box.astype(str)]
+                log.info( f"rotated_box = {text}, area = {min_box_area}, width = {area_width: .2f}, height = {area_height: .2f}")
+            pass
 
             if arc_perimeter == 0 :
                 is_line = False
