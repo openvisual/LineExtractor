@@ -69,7 +69,7 @@ for i, contour in enumerate(contours):
     # Fitting a Line
     # (ax, ay) is a vector collinear to the line
     # (x0, y0) is a point on the line.
-    [ax, ay, x0, y0] = cv.fitLine(contour, cv.DIST_L2, 0, 0.001, 0.001)
+    t = [ax, ay, x0, y0] = cv.fitLine(contour, cv.DIST_L2, 0, 0.001, 0.001)
 
     log.info( f"fitLine: ax = {ax}, ay = {ay}, x0 = {x0}, y0 = {y0}")
 
@@ -80,26 +80,45 @@ for i, contour in enumerate(contours):
     d = sqrt( ax*ax + ay*ay )
 
     x1 = 0
-    y1 = int( y0 + a * (x1 - x0) )
+    y1 = int( y0 + (ay/ax) * (x1 - x0) ) if ax else y0
 
     x2 = width - 1
-    y2 = int( y0 + a * (x2 - x0) )
+    y2 = int( y0 + (ay/ax) * (x2 - x0) ) if ax else y0
 
     cv.line(img, (x1, y1), ( x2, y2), (255, 255, 0), 2, cv.LINE_AA)
 
+    from shapely.geometry import LineString, Point
+    from shapely.ops import nearest_points
+
+    line = LineString( [(x1, y1), (x2, y2)] )
+
     cv.circle(img, (int(x0), int(y0) ), 5, (255, 0, 255), 2, cv.LINE_AA)
 
-    box_length = max( area_width, area_height )
+    p = min_box[0]
 
-    x1 = min_box[0][0]
-    y1 = int(y0 + a * (x1 - x0))
+    for q in min_box :
+        if q[0] < p[0] :
+            p = q
+        pass
+    pass
 
-    cv.circle(img, (int(x1), int(y1)), 5, (0, 255, 255), 2, cv.LINE_AA)
+    p = Point( p[0], p[1] )
+    np = nearest_points(line, p)[0]
 
-    x1 = min_box[1][0]
-    y1 = int(y0 + a * (x1 - x0))
+    cv.circle(img, (int(np.x), int(np.y)), 3, (0, 255, 255), 2, cv.LINE_AA)
 
-    cv.circle(img, (int(x1), int(y1)), 5, (255, 0, 0), 2, cv.LINE_AA)
+    p = min_box[0]
+
+    for q in min_box:
+        if q[0] > p[0]:
+            p = q
+        pass
+    pass
+
+    p = Point(p[0], p[1])
+    np = nearest_points(line, p)[0]
+
+    cv.circle(img, (int(np.x), int(np.y)), 3, (255, 0, 0), 2, cv.LINE_AA)
 pass
 
 plt.imshow( img )
