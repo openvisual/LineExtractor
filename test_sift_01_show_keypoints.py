@@ -14,7 +14,7 @@ dirname and os.chdir( dirname )
 dirname and print( "Pwd 2: %s" % os.getcwd())
 
 img_path = "./data_yegan/set_00/01_left.jpg"
-img_path = "./data_yegan/set_00/02_right.jpg"
+#img_path = "./data_yegan/set_00/02_right.jpg"
 img = cv.imread( img_path )
 
 # resize image
@@ -33,7 +33,7 @@ print( "keypoints: " , kp )
 
 img = cv.drawKeypoints( gray, kp, img )
 
-cv.imwrite('sift_keypoints.jpg',img)
+cv.imwrite('sift_keypoints_01.jpg',img)
 
 cv.imshow( "SIFT B", img )
 
