@@ -639,29 +639,29 @@ class Image (Common) :
 
             line = LineString([(x1, y1), (x2, y2)])
 
-            p = min_box[0]
+            p_min = min_box[0]
 
             for q in min_box:
-                if q[0] < p[0]:
-                    p = q
+                if q[0] < p_min[0]:
+                    p_min = q
                 pass
             pass
 
             #log.info( f"px = {p[0]}, py = {p[1]}" )
 
-            pp = geometry.Point(p[0], p[1])
-            p0 = nearest_points(line, pp)[0]
+            p = geometry.Point(p_min[0], p_min[1])
+            p0 = nearest_points(line, p)[0]
 
-            p = min_box[0]
+            p_max = min_box[0]
 
             for q in min_box:
-                if q[0] > p[0]:
-                    p = q
+                if q[0] > p_max[0]:
+                    p_max = q
                 pass
             pass
 
-            pp = geometry.Point(p[0], p[1])
-            p1 = nearest_points(line, pp)[0]
+            q = geometry.Point(p_max[0], p_max[1])
+            p1 = nearest_points(line, q)[0]
 
             line_extracted = np.array( [ [ [ int(p0.x), int(p0.y)] ], [ [ int(p1.x), int(p1.y) ] ]] )
 
