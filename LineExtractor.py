@@ -26,10 +26,12 @@ class LineExtractor ( Common ):
 
         self.margin_width = 0
         self.margin_height = 0
+
+        self.grayscale = None
     pass
 
     @profile
-    def my_line_extract(self, img_path, qtUi = None, mode="A", lineListA=None) :
+    def my_line_extract(self, img_path, qtUi = None, mode="A", lineListA=None, grayscale_prev=None) :
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
         Image.img_save_cnt = 0
@@ -126,6 +128,8 @@ class LineExtractor ( Common ):
         if 1 : # -- grayscale 변환
             #grayscale = curr_image.to_grayscale_multiotsu()
             grayscale = curr_image.grayscale()
+
+            self.grayscale = grayscale
 
             curr_image = grayscale
 

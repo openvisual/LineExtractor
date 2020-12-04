@@ -47,6 +47,9 @@ pts_dst = []
 goods = []
 matchesMask = []
 
+img_1_rgb = cv2.cvtColor( img_1, cv2.COLOR_GRAY2RGB)
+img_2_rgb = cv2.cvtColor( img_2, cv2.COLOR_GRAY2RGB)
+
 for i, (m1, m2) in enumerate(matches):
     valid = True
 
@@ -77,10 +80,10 @@ for i, (m1, m2) in enumerate(matches):
 
             print(i, pt1, pt2 )
 
-            if 1 and ( i % 5 == 0 ):
+            if 1 or ( i % 5 == 0 ):
                 # Draw pairs in purple, to make sure the result is ok
-                cv2.circle(img_1, (int(pt1[0]), int(pt1[1])), 5, (255, 0, 0), -1)
-                cv2.circle(img_2, (int(pt2[0]), int(pt2[1])), 5, (0, 0, 255), -1)
+                cv2.circle(img_1_rgb, (int(pt1[0]), int(pt1[1])), 20, (255, 255, 0), 8)
+                cv2.circle(img_1_rgb, (int(pt2[0]), int(pt2[1])), 20, (0, 255, 255), 8)
             pass
         pass
     pass
@@ -88,7 +91,7 @@ pass
 
 h, status = cv2.findHomography( np.array(pts_src), np.array(pts_dst) )
 
-img3 = cv2.warpPerspective(img_1, h, (img_2.shape[1], img_2.shape[0]))
+img3 = cv2.warpPerspective(img_1_rgb, h, (img_1_rgb.shape[1], img_1_rgb.shape[0]))
 
 #draw_params = dict(matchColor = (255, 0, 0), singlePointColor = (0, 0, 255), matchesMask = matchesMask, flags = 0)
 
