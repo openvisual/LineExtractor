@@ -314,6 +314,89 @@ class LineExtractor ( Common ):
             lineList.lineListIdentified = lineListIdentified
         pass
 
+        if grayscale_prev is not None :
+            # Initiate SIFT detector
+            sift = cv2.SIFT_create()
+
+            img_1 = self.grayscale.img
+            img_2 = grayscale_prev.img
+
+            # find the keypoints and descriptors with SIFT
+            kp1, des1 = sift.detectAndCompute( img_1, None )
+            kp2, des2 = sift.detectAndCompute( img_2, None )
+
+            # FLANN parameters
+            FLANN_INDEX_KDTREE = 1
+            index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+            search_params = dict(checks=50)
+
+            flann = cv2.FlannBasedMatcher(index_params, search_params)
+
+            # Ratio test
+            matches = flann.knnMatch(des1, des2, k=2)
+
+            dim_square = max([len(img_1), len(img_1[0])]) * 0.3
+            dim_square = dim_square * dim_square
+
+            pts_src = []
+            pts_dst = []
+
+            goods = []
+            matchesMask = []
+
+            img_1_rgb = cv2.cvtColor(img_1, cv2.COLOR_GRAY2RGB)
+            img_2_rgb = cv2.cvtColor(img_2, cv2.COLOR_GRAY2RGB)
+
+            for i, (m1, m2) in enumerate(matches):
+                valid = True
+
+                ratio = 0.7
+                # ratio = 0.9
+
+                if valid and (m1.distance > ratio * m2.distance):
+                    valid = False
+                pass
+
+                if valid:
+                    pt1 = kp1[m1.queryIdx].pt
+                    pt2 = kp2[m1.trainIdx].pt
+
+                    dx = pt1[0] - pt2[0]
+                    dy = pt1[1] - pt2[1]
+
+                    if dx * dx + dy * dy > dim_square:
+                        valid = False
+                    pass
+
+                    if valid:
+                        pts_src.append(pt1)
+                        pts_dst.append(pt2)
+
+                        goods.append([m1, m2])
+                        matchesMask.append([1, 0])
+
+                        print(i, pt1, pt2)
+
+                        if 1 or (i % 5 == 0):
+                            # Draw pairs in purple, to make sure the result is ok
+                            cv2.circle(img_1_rgb, (int(pt1[0]), int(pt1[1])), 20, (255, 255, 0), 8)
+                            cv2.circle(img_1_rgb, (int(pt2[0]), int(pt2[1])), 20, (0, 255, 255), 8)
+                        pass
+                    pass
+                pass
+            pass
+
+            h, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst))
+
+            img3 = cv2.warpPerspective(img_1_rgb, h, (img_2_rgb.shape[1], img_2_rgb.shape[0]))
+
+            # draw_params = dict(matchColor = (255, 0, 0), singlePointColor = (0, 0, 255), matchesMask = matchesMask, flags = 0)
+
+            # img3 = cv2.drawMatchesKnn(img_1, kp1, img_2, kp2, goods, None, **draw_params)
+
+            cv.imwrite('sift_homograpy.jpg', img3)
+        pass
+
         lineList.mode = mode
 
         return lineList
@@ -370,7 +453,8 @@ if __name__ == '__main__':
         nextFile = lineExtractor.next_file( img_path )
 
         if nextFile is not None :
-            lineListB = lineExtractor.my_line_extract( img_path=nextFile, qtUi=None, lineListA=lineListA )
+            grayscale_prev = lineExtractor.grayscale
+            lineListB = lineExtractor.my_line_extract( img_path=nextFile, qtUi=None, lineListA=lineListA, grayscale_prev=grayscale_prev )
 
             lineListMatched.extend(lineListB.lineListIdentified)
         pass
