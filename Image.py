@@ -667,7 +667,6 @@ class Image (Common) :
 
             lines.append(line_extracted)
         pass
-
     pass
 
     @profile
