@@ -144,9 +144,9 @@ class LineExtractor ( Common ):
             algorithm = "gaussianBlur"
             algorithm = "bilateralFilter"
             bsize = 7
-            sigmaColor = 75
-            sigmaSpace = 75
-            noise_removed = curr_image.remove_noise( algorithm=algorithm, bsize = bsize, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
+            sigma_color = 75
+            sigma_space = 75
+            noise_removed = curr_image.remove_noise( algorithm=algorithm, bsize = bsize, sigma_color=sigma_color, sigma_space=sigma_space )
             curr_image = noise_removed
 
             title = curr_image.algorithm

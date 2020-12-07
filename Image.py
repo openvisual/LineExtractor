@@ -846,10 +846,10 @@ class Image (Common) :
 
         return Image(img=data, algorithm=algorithm)
 
-    pass  # -- draw_polylines
+    pass # -- draw_polylines
 
     @profile
-    def remove_noise(self, algorithm , bsize=5 , sigmaColor=75, sigmaSpace=75):
+    def remove_noise(self, algorithm , bsize=5 , sigma_color=75, sigma_space=75):
         # TODO   잡음 제거
         log.info(inspect.getframeinfo(inspect.currentframe()).function)
 
@@ -862,10 +862,10 @@ class Image (Common) :
             img = img.astype(np.uint8)
             data = cv.GaussianBlur(img, (bsize, bsize), 0)
         elif algorithm == "bilateralFilter" :
-            algorithm = f"{algorithm} bsize={bsize}, sigmaColor={sigmaColor}, sigmaSpace={sigmaSpace}"
+            algorithm = f"{algorithm} bsize={bsize}, sigmaColor={sigma_color}, sigma_space={sigma_space}"
 
             img = img.astype(np.uint8)
-            data = cv2.bilateralFilter(img, bsize, sigmaColor, sigmaSpace)
+            data = cv2.bilateralFilter(img, bsize, sigma_color, sigma_space)
         elif algorithm == "medianBlur" :
             algorithm = f"{algorithm} bsize={bsize}"
 
