@@ -325,15 +325,19 @@ class LineExtractor ( Common ):
             kp1, des1 = sift.detectAndCompute( img_1, None )
             kp2, des2 = sift.detectAndCompute( img_2, None )
 
-            # FLANN parameters
-            FLANN_INDEX_KDTREE = 1
-            index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-            search_params = dict(checks=50)
+            matches = []
 
-            flann = cv2.FlannBasedMatcher(index_params, search_params)
+            if True :
+                # FLANN parameters
+                FLANN_INDEX_KDTREE = 1
+                index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+                search_params = dict(checks=50)
 
-            # Ratio test
-            matches = flann.knnMatch(des1, des2, k=2)
+                flann = cv2.FlannBasedMatcher(index_params, search_params)
+
+                # Ratio test
+                matches = flann.knnMatch(des1, des2, k=2)
+            pass
 
             dim_square = max([len(img_1), len(img_1[0])]) * 0.3
             dim_square = dim_square * dim_square
@@ -347,7 +351,7 @@ class LineExtractor ( Common ):
             img_1_rgb = cv2.cvtColor(img_1, cv2.COLOR_GRAY2RGB)
             img_2_rgb = cv2.cvtColor(img_2, cv2.COLOR_GRAY2RGB)
 
-            for i, (m1, m2) in enumerate(matches):
+            for _, (m1, m2) in enumerate(matches):
                 valid = True
 
                 ratio = 0.7
@@ -386,21 +390,28 @@ class LineExtractor ( Common ):
                 pass
             pass
 
+            curr_image.save_img_as_file(img_path, f"sift_a.jpg", img=img_1_rgb)
+
+            curr_image.save_img_as_file(img_path, f"sift_b.jpg", img=img_2_rgb)
+
+            draw_params = dict(matchColor=(255, 0, 0), singlePointColor=(0, 0, 255), matchesMask=matchesMask, flags=0)
+
+            img3 = cv2.drawMatchesKnn(img_1, kp1, img_2, kp2, goods, None, **draw_params)
+
+            curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
+
             h, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst))
 
-            img3 = cv2.warpPerspective(img_1_rgb, h, (img_2_rgb.shape[1], img_2_rgb.shape[0]))
+            img4 = cv2.warpPerspective(img_1_rgb, h, (img_2_rgb.shape[1], img_2_rgb.shape[0]))
 
-            # draw_params = dict(matchColor = (255, 0, 0), singlePointColor = (0, 0, 255), matchesMask = matchesMask, flags = 0)
-
-            # img3 = cv2.drawMatchesKnn(img_1, kp1, img_2, kp2, goods, None, **draw_params)
-
-            cv.imwrite('sift_homograpy.jpg', img3)
+            curr_image.save_img_as_file(img_path, "sift_homograpy.jpg", img=img4)
         pass
 
         lineList.mode = mode
 
         return lineList
-    pass
+    pass # -- my_line_extract
+
 pass # -- LineExtractor
 
 if __name__ == '__main__':

@@ -41,7 +41,6 @@ class Image (Common) :
         # 2차원 이미지 배열 데이터
         self.img = img
         self.algorithm = algorithm
-        self.fileName = None
         self.reverse_required = False
     pass
 
@@ -94,21 +93,20 @@ class Image (Common) :
     pass  # -- img_file_name
 
     @profile
-    def save_img_as_file(self, img_path, work, ):
+    def save_img_as_file(self, img_path, work, img=None ):
         fileName = self.img_file_name( img_path, work)
-        img = self.img
+
+        if img is None :
+            img = self.img
+        pass
 
         cmap = "gray"
 
         if hasattr(img, "shape") and len( img.shape) > 2 and img.shape[2] == 3 :
-            cmap = None
-
             cv2.imwrite(fileName, img)
         else :
             plt.imsave(fileName, img, cmap=cmap)
         pass
-
-        self.fileName = fileName
 
         log.info( f"Image saved as file name[ {fileName} ]" )
 
