@@ -384,7 +384,7 @@ class LineExtractor ( Common ):
                         if 1 or (i % 5 == 0):
                             # Draw pairs in purple, to make sure the result is ok
                             cv2.circle(img_1_rgb, (int(pt1[0]), int(pt1[1])), 20, (255, 255, 0), 8)
-                            cv2.circle(img_1_rgb, (int(pt2[0]), int(pt2[1])), 20, (0, 255, 255), 8)
+                            cv2.circle(img_2_rgb, (int(pt2[0]), int(pt2[1])), 20, (0, 255, 255), 8)
                         pass
                     pass
                 pass
