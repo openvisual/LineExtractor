@@ -350,7 +350,6 @@ class LineExtractor ( Common ):
 
             goods = []
             matchesMask = []
-            kp_goods = [ [], [] ]
 
             img_rgb = [ cv2.cvtColor( img[0], cv2.COLOR_GRAY2RGB), cv2.cvtColor( img[1], cv2.COLOR_GRAY2RGB) ]
 
@@ -377,9 +376,6 @@ class LineExtractor ( Common ):
                     pass
 
                     if valid:
-                        kp_goods[0].append( kp[0][m1.queryIdx] )
-                        kp_goods[1].append( kp[1][m1.trainIdx] )
-
                         pts_src.append(pts[0])
                         pts_dst.append(pts[1])
 
@@ -403,15 +399,19 @@ class LineExtractor ( Common ):
 
             draw_params = dict(matchColor=(255, 0, 0), singlePointColor=(0, 0, 255), matchesMask=matchesMask, flags=0)
 
-            img3 = cv2.drawMatchesKnn( img[0], kp_goods[0], img[1], kp_goods[1], goods, None, **draw_params)
+            img3 = cv2.drawMatchesKnn( img[0], kp[0], img[1], kp[1], goods, None, **draw_params)
 
             curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
 
             h, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst))
 
-            img4 = cv2.warpPerspective(img_rgb[0], h, (img_rgb[1].shape[1], img_rgb[1].shape[0]), img_rgb[1])
+            img4 = cv2.warpPerspective(img_rgb[0], h, (img_rgb[1].shape[1], img_rgb[1].shape[0]) )
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy.jpg", img=img4)
+            curr_image.save_img_as_file(img_path, "sift_homograpy_a.jpg", img=img4)
+
+            img5 = cv2.warpPerspective(img_rgb[1], h, (img_rgb[1].shape[1], img_rgb[1].shape[0]) )
+
+            curr_image.save_img_as_file(img_path, "sift_homograpy_b.jpg", img=img5)
         pass
 
         lineList.mode = mode
