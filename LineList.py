@@ -75,6 +75,17 @@ class LineList( list ) :
 
     @profile
     def merge_lines(self, error_deg=1, snap_dist=5):
+        use_gropuing = True
+
+        if use_gropuing :
+            return self.merge_lines_after_grouping(error_deg=error_deg, snap_dist=snap_dist)
+        else :
+            return self.merge_lines_simple(error_deg=error_deg, snap_dist=snap_dist)
+        pass
+    pass
+
+    @profile
+    def merge_lines_simple(self, error_deg=1, snap_dist=5):
         debug = False
 
         lines = self
@@ -111,48 +122,42 @@ class LineList( list ) :
         merge_lines = merge_lines[:: -1]
 
         lineList = LineList(lines=merge_lines, algorithm=self.algorithm, w=self.w, h=self.h, fileBase=self.fileBase, mode=self.mode)
-        lineList.algorithm = f"line merge(error_deg={error_deg}, snap={snap_dist})"
+        lineList.algorithm = f"line merge simple(error_deg={error_deg}, snap={snap_dist})"
 
         return lineList
 
-    pass  # -- merge_lines
+    pass  # -- merge_lines_simple
 
     @profile
-    def merge_lines_old(self, error_deg=1, snap_dist=5):
+    def merge_lines_after_grouping(self, error_deg=1, snap_dist=5):
         debug = False
 
         lines = self
 
         lines = list(filter(lambda x: x.length() != 0, lines))
 
-        merge_lines = []
-
         idx = 0
 
-        while idx < 5 and len(lines) != len(merge_lines):
-            log.info(f"line merge[{idx}]")
-            idx += 1
+        lineGroups = []
 
-            lineGrps = []
-
-            for line in lines:
-                line_found, _, lineGrp_found = line.get_most_mergeable_line_from_linegrps(lineGrps, error_deg=error_deg,
-                                                                                          snap_dist=snap_dist)
-                if line_found is not None:
-                    lineGrp_found.append(line)
-                else:
-                    lineGrps.append([line])
-                pass
-            pass
-
-            if len(lines) > len(lineGrps):
-                merge_lines = []
-                for lineGrp in lineGrps:
-                    merge_lines.append(LineList.merge_into_single_line(lineGrp))
-                pass
+        for line in lines:
+            line_group_found = line.get_most_mergeable_line_from_linegrps(lineGroups, error_deg=error_deg,
+                                                                          snap_dist=snap_dist)
+            if line_group_found is not None:
+                line_group_found.append(line)
             else:
-                merge_lines = lines
+                lineGroups.append([line])
             pass
+        pass
+
+        merge_lines = []
+
+        if True :
+            for line_group in lineGroups:
+                merge_lines.append(LineList.merge_into_single_line(line_group))
+            pass
+        else:
+            merge_lines = lines
         pass
 
         merge_lines = sorted(merge_lines, key=cmp_to_key(Line.compare_line_length))
@@ -160,11 +165,11 @@ class LineList( list ) :
 
         lineList = LineList(lines=merge_lines, algorithm=self.algorithm, w=self.w, h=self.h, fileBase=self.fileBase,
                             mode=self.mode)
-        lineList.algorithm = f"line merge(error_deg={error_deg}, snap={snap_dist})"
+        lineList.algorithm = f"line merge group(error_deg={error_deg}, snap={snap_dist})"
 
         return lineList
 
-    pass  # -- merge_lines_old
+    pass  # -- merge_lines_after_grouping
 
     @staticmethod
     def merge_into_single_line(lines, error_deg=1, snap_dist=5):

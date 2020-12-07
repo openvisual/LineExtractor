@@ -255,21 +255,20 @@ class Line:
 
     pass  # --get_most_similar_line_from_list
 
-    def get_most_mergeable_line_from_linegrps(self, lineGrpList , error_deg=1, snap_dist=5 ):
-        lineGrp_found = None
-        line_found = None
+    def get_most_mergeable_line_from_linegrps(self, line_groups, error_deg=1, snap_dist=5):
+        line_group_found = None
         similarity_max = 0
 
-        for lineGrp in lineGrpList:
-            line, similarity = self.get_most_mergeable_line_from_lines( lineGrp, error_deg=error_deg, snap_dist=snap_dist )
-            if line is not None and similarity >= similarity_max:
-                lineGrp_found = lineGrp
-                line_found = line
+        for line_group in line_groups:
+            line, similarity = self.get_most_mergeable_line_from_lines( line_group, error_deg=error_deg, snap_dist=snap_dist )
+            if line is not None and similarity > similarity_max:
+                line_group_found = line_group
                 similarity_max = similarity
             pass
         pass
 
-        return line_found, similarity_max, lineGrp_found
+        return line_group_found
+    pass
 
     pass  # --get_most_similar_line_from_linegrp_list
 
