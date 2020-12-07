@@ -318,12 +318,15 @@ class LineExtractor ( Common ):
             # Initiate SIFT detector
             sift = cv2.SIFT_create()
 
-            img_1 = self.grayscale.img
-            img_2 = grayscale_prev.img
+            img = [ self.grayscale.img, grayscale_prev.img ]
 
             # find the keypoints and descriptors with SIFT
-            kp1, des1 = sift.detectAndCompute( img_1, None )
-            kp2, des2 = sift.detectAndCompute( img_2, None )
+
+            kp1, des1 = sift.detectAndCompute( img[0], None )
+            kp2, des2 = sift.detectAndCompute( img[1], None )
+
+            kp = [ kp1, kp2 ]
+            des = [ des1, des2 ]
 
             matches = []
 
@@ -336,10 +339,10 @@ class LineExtractor ( Common ):
                 flann = cv2.FlannBasedMatcher(index_params, search_params)
 
                 # Ratio test
-                matches = flann.knnMatch(des1, des2, k=2)
+                matches = flann.knnMatch(des[0], des[1], k=2)
             pass
 
-            dim_square = max([len(img_1), len(img_1[0])]) * 0.3
+            dim_square = max([len( img[0] ), len( img[1] )]) * 0.3
             dim_square = dim_square * dim_square
 
             pts_src = []
@@ -348,10 +351,9 @@ class LineExtractor ( Common ):
             goods = []
             matchesMask = []
 
-            img_1_rgb = cv2.cvtColor(img_1, cv2.COLOR_GRAY2RGB)
-            img_2_rgb = cv2.cvtColor(img_2, cv2.COLOR_GRAY2RGB)
+            img_rgb = [ cv2.cvtColor( img[0], cv2.COLOR_GRAY2RGB), cv2.cvtColor( img[1], cv2.COLOR_GRAY2RGB) ]
 
-            for _, (m1, m2) in enumerate(matches):
+            for i, (m1, m2) in enumerate(matches):
                 valid = True
 
                 ratio = 0.7
@@ -362,47 +364,50 @@ class LineExtractor ( Common ):
                 pass
 
                 if valid:
-                    pt1 = kp1[m1.queryIdx].pt
-                    pt2 = kp2[m1.trainIdx].pt
+                    pts = [ kp[0][m1.queryIdx].pt, kp[1][m1.trainIdx].pt ]
 
-                    dx = pt1[0] - pt2[0]
-                    dy = pt1[1] - pt2[1]
+                    log.info( f"m1.queryIdx = {m1.queryIdx}, m1.trainIdx = {m1.trainIdx}")
+
+                    dx = pts[0][0] - pts[1][0]
+                    dy = pts[0][1] - pts[1][1]
 
                     if dx * dx + dy * dy > dim_square:
                         valid = False
                     pass
 
                     if valid:
-                        pts_src.append(pt1)
-                        pts_dst.append(pt2)
+                        pts_src.append(pts[0])
+                        pts_dst.append(pts[1])
 
                         goods.append([m1, m2])
                         matchesMask.append([1, 0])
 
-                        print(i, pt1, pt2)
+                        print(i, pts[0], pts[1])
 
-                        if 1 or (i % 5 == 0):
+                        if 0 or (i % 5 == 0):
                             # Draw pairs in purple, to make sure the result is ok
-                            cv2.circle(img_1_rgb, (int(pt1[0]), int(pt1[1])), 20, (255, 255, 0), 8)
-                            cv2.circle(img_2_rgb, (int(pt2[0]), int(pt2[1])), 20, (0, 255, 255), 8)
+                            cv2.circle(img_rgb[0], (int(pts[0][0]), int(pts[0][1])), 20, (255, 255, 0), 8)
+                            cv2.circle(img_rgb[1], (int(pts[1][0]), int(pts[1][1])), 20, (0, 255, 255), 8)
                         pass
                     pass
+
                 pass
-            pass
+            pass # -- for
 
-            curr_image.save_img_as_file(img_path, f"sift_a.jpg", img=img_1_rgb)
+            img_rgb = [ cv.drawKeypoints(img[0], kp1, img_rgb[0]), cv.drawKeypoints(img[1], kp2, img_rgb[1]) ]
 
-            curr_image.save_img_as_file(img_path, f"sift_b.jpg", img=img_2_rgb)
+            curr_image.save_img_as_file(img_path, f"sift_a.jpg", img=img_rgb[0])
+            curr_image.save_img_as_file(img_path, f"sift_b.jpg", img=img_rgb[1])
 
             draw_params = dict(matchColor=(255, 0, 0), singlePointColor=(0, 0, 255), matchesMask=matchesMask, flags=0)
 
-            img3 = cv2.drawMatchesKnn(img_1, kp1, img_2, kp2, goods, None, **draw_params)
+            img3 = cv2.drawMatchesKnn( img[0], kp[0], img[1], kp[1], goods, None, **draw_params)
 
             curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
 
             h, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst))
 
-            img4 = cv2.warpPerspective(img_1_rgb, h, (img_2_rgb.shape[1], img_2_rgb.shape[0]))
+            img4 = cv2.warpPerspective(img_rgb[0], h, (img_rgb[1].shape[1], img_rgb[1].shape[0]))
 
             curr_image.save_img_as_file(img_path, "sift_homograpy.jpg", img=img4)
         pass
