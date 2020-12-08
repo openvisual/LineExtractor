@@ -405,7 +405,10 @@ class LineExtractor ( Common ):
 
             curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
 
-            H, h_mask = cv2.findHomography(np.float32(pts_src), np.float32(pts_dst), cv2.RANSAC, 5)
+            pts_src = np.float32(pts_src).reshape(-1, 1, 2)
+            pts_dst = np.float32(pts_dst).reshape(-1, 1, 2)
+
+            H, h_mask = cv2.findHomography( pts_src, pts_dst, cv2.RANSAC, 5)
 
             # Apply a horizontal panorama
             trainImg = img_rgb[0]
@@ -414,9 +417,10 @@ class LineExtractor ( Common ):
             height = max( trainImg.shape[0], queryImg.shape[0] )
 
             result_01 = cv2.warpPerspective( trainImg, H, (width, height) )
-            result_02 = cv2.warpPerspective( queryImg, H, (width, height) )
+            #result_02 = cv2.warpPerspective( queryImg, H, (width, height) )
 
-            result_01[ 0 : result_02.shape[0] , result_02.shape[1]//2 : width ] = result_02[ 0 : result_02.shape[0] , 0 : result_02.shape[1]//2 ]
+            #result_01[ 0 : result_02.shape[0] , result_02.shape[1]//2 : width ] = result_02[ 0 : result_02.shape[0] , 0 : result_02.shape[1]//2 ]
+            result_01[0: result_01.shape[0], result_01.shape[1] // 2: width] = queryImg
 
             curr_image.save_img_as_file(img_path, "sift_homograpy.jpg", img=result_01)
 
