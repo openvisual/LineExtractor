@@ -396,14 +396,14 @@ class LineExtractor ( Common ):
                 pass
             pass # -- for
 
-            curr_image.save_img_as_file(img_path, f"sift_a.jpg", img=img_rgb[0])
-            curr_image.save_img_as_file(img_path, f"sift_b.jpg", img=img_rgb[1])
+            curr_image.save_img_as_file(img_path, f"sift_a", img=img_rgb[0])
+            curr_image.save_img_as_file(img_path, f"sift_b", img=img_rgb[1])
 
             draw_params = dict(matchColor=(255, 0, 0), singlePointColor=(0, 0, 255), matchesMask=matchesMask, flags=0)
 
             img3 = cv2.drawMatchesKnn( img[0], kp[0], img[1], kp[1], goods, None, **draw_params)
 
-            curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
+            curr_image.save_img_as_file(img_path, "sift_match", img=img3 )
 
             pts_src = np.float32(pts_src).reshape(-1, 1, 2)
             pts_dst = np.float32(pts_dst).reshape(-1, 1, 2)
@@ -420,7 +420,12 @@ class LineExtractor ( Common ):
 
             img4[0: img4.shape[0], img4.shape[1] // 2: width] = queryImg
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy.jpg", img=img4)
+            curr_image.save_img_as_file(img_path, "sift_homograpy", img=img4)
+
+            img5 = img4[0: img4.shape[0], 0 : img4.shape[1] // 2 ]
+            img5 = img5/2 + queryImg/2
+
+            curr_image.save_img_as_file(img_path, "sift_homograpy_overlap", img=img5)
 
         pass
 
