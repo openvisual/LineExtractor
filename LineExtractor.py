@@ -403,7 +403,7 @@ class LineExtractor ( Common ):
 
             curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
 
-            h, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst))
+            h, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst), cv2.RANSAC, 4)
 
             img4 = cv2.warpPerspective(img_rgb[0], h, (img_rgb[1].shape[1], img_rgb[1].shape[0]) )
 
