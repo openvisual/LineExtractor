@@ -416,13 +416,11 @@ class LineExtractor ( Common ):
             width = trainImg.shape[1] + queryImg.shape[1]
             height = max( trainImg.shape[0], queryImg.shape[0] )
 
-            result_01 = cv2.warpPerspective( trainImg, H, (width, height) )
-            #result_02 = cv2.warpPerspective( queryImg, H, (width, height) )
+            img4 = cv2.warpPerspective( trainImg, H, (width, height) )
 
-            #result_01[ 0 : result_02.shape[0] , result_02.shape[1]//2 : width ] = result_02[ 0 : result_02.shape[0] , 0 : result_02.shape[1]//2 ]
-            result_01[0: result_01.shape[0], result_01.shape[1] // 2: width] = queryImg
+            img4[0: img4.shape[0], img4.shape[1] // 2: width] = queryImg
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy.jpg", img=result_01)
+            curr_image.save_img_as_file(img_path, "sift_homograpy.jpg", img=img4)
 
         pass
 
