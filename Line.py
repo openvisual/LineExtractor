@@ -235,11 +235,11 @@ class Line:
         return similarity
     pass # -- get_similarity
 
-    def get_most_mergeable_line_from_lines(self, lineList, error_deg= None, snap_dist= None ):
+    def get_most_mergeable_line_from_lines(self, lines, error_deg= None, snap_dist= None):
         line_found = None
         similarity_max = 0
 
-        for line in lineList :
+        for line in lines :
             if self == line :
                 pass
             elif ( error_deg is None or snap_dist is None ) or self.is_mergeable( line, error_deg=error_deg, snap_dist=snap_dist) :

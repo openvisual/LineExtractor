@@ -75,7 +75,7 @@ class LineList( list ) :
 
     @profile
     def merge_lines(self, error_deg=1, snap_dist=5):
-        use_grouping = True
+        use_grouping = False
 
         if use_grouping :
             return self.merge_lines_after_grouping(error_deg=error_deg, snap_dist=snap_dist)
@@ -92,27 +92,29 @@ class LineList( list ) :
 
         lines = list(filter(lambda x: x.length() != 0 , lines))
 
-        i = 0
-        while i < len( lines ) :
-            line = lines[ i ]
-            line_found, _ = line.get_most_mergeable_line_from_lines( lines, error_deg=error_deg, snap_dist=snap_dist )
-            if line_found is not None and line != line_found :
-                line_merge = line.merge( line_found )
+        is_merged = True
 
-                index = lines.index( line_found )
-                if index < i :
-                    lines[ index ] = line_merge
+        while is_merged :
+            is_merged = False
 
-                    lines.pop( i )
+            i = 0
+            while i < len( lines ) :
+                line = lines[ i ]
+                line_found, _ = line.get_most_mergeable_line_from_lines( lines, error_deg=error_deg, snap_dist=snap_dist )
 
-                    i = index
-                else :
+                if line_found is not None :
+                    line_merge = line.merge( line_found )
+
+                    is_merged = True
+
                     lines[ i ] = line_merge
 
-                    lines.pop( index )
+                    lines.pop( lines.index(line_found) )
+                    i = 0
+                    break
+                else :
+                    i += 1
                 pass
-            else :
-                i += 1
             pass
         pass
 
@@ -138,22 +140,22 @@ class LineList( list ) :
 
         idx = 0
 
-        lineGroups = []
+        line_groups = []
 
         for line in lines:
-            line_group_found = line.get_most_mergeable_line_from_linegrps(lineGroups, error_deg=error_deg,
+            line_group_found = line.get_most_mergeable_line_from_linegrps(line_groups, error_deg=error_deg,
                                                                           snap_dist=snap_dist)
             if line_group_found is not None:
                 line_group_found.append(line)
             else:
-                lineGroups.append([line])
+                line_groups.append([line])
             pass
         pass
 
         merge_lines = []
 
-        if True :
-            for line_group in lineGroups:
+        if line_groups :
+            for line_group in line_groups:
                 merge_lines.append(LineList.merge_into_single_line(line_group))
             pass
         else:
