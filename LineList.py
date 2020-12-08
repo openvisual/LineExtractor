@@ -75,9 +75,9 @@ class LineList( list ) :
 
     @profile
     def merge_lines(self, error_deg=1, snap_dist=5):
-        use_gropuing = True
+        use_grouping = True
 
-        if use_gropuing :
+        if use_grouping :
             return self.merge_lines_after_grouping(error_deg=error_deg, snap_dist=snap_dist)
         else :
             return self.merge_lines_simple(error_deg=error_deg, snap_dist=snap_dist)
