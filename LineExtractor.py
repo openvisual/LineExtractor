@@ -102,7 +102,7 @@ class LineExtractor ( Common ):
         image_org = Image( img_org )
         image_org.save_img_as_file( img_path, "org" )
         title = f'Original Image: { img_path.split("/")[-1] }'
-        0 and image_org.plot_image(title=title, cmap=None, border_color = "green", qtUi=qtUi, mode=mode)
+        0 and image_org.plot_image(title=title, cmap=None, border_color="green", qtUi=qtUi, mode=mode)
 
         curr_image = image_org
 
@@ -405,7 +405,7 @@ class LineExtractor ( Common ):
 
             curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
 
-            H, h_mask = cv2.findHomography(np.array(pts_src), np.array(pts_dst), cv2.RANSAC, 4)
+            H, h_mask = cv2.findHomography(np.float32(pts_src), np.float32(pts_dst), cv2.RANSAC, 5)
 
             # Apply a horizontal panorama
             trainImg = img_rgb[0]

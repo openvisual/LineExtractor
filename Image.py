@@ -127,7 +127,7 @@ class Image (Common) :
 
         if qtUi is not None :
             qtUi.plot_image( title=title, border_color=border_color, image=self, mode=mode )
-        else :
+        elif 0 :
             return self.plot_image_by_matplot( title, border_color )
         pass
     pass # -- plot_image
@@ -181,7 +181,7 @@ class Image (Common) :
     def plot_histogram(self, qtUi=None, mode="A" ):  # 히스토 그램 표출
         if qtUi is not None :
             qtUi.plot_histogram( image=self, mode=mode )
-        else :
+        elif 0 :
             self.plot_histogram_by_matplot()
         pass
     pass
