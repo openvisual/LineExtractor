@@ -241,6 +241,7 @@ class LineExtractor ( Common ):
 
         useCanny = False
         if useCanny:
+            # 케니 엣지
             canny = curr_image.canny(min=0, max=255)
 
             curr_image = canny
@@ -254,6 +255,7 @@ class LineExtractor ( Common ):
         useContour = True
         useHoughLine = True
         if useContour:
+            # 등고선 추출
             lineWidth = 1
             lineWidth = 2
 
@@ -445,6 +447,7 @@ if __name__ == '__main__':
 
     img_path = "./data_yegan/set_04/P1010015.JPG"
     img_path = "./data_yegan/set_01/_1018843.JPG"
+    img_path = "./data_yegan/grp_01/01"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)
