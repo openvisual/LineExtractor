@@ -426,7 +426,6 @@ class LineExtractor ( Common ):
             img5 = img5/2 + queryImg/2
 
             curr_image.save_img_as_file(img_path, "sift_homograpy_overlap", img=img5)
-
         pass
 
         lineList.mode = mode
