@@ -405,7 +405,7 @@ class LineExtractor ( Common ):
 
             curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
 
-            H, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst), cv2.RANSAC, 4)
+            H, h_mask = cv2.findHomography(np.array(pts_src), np.array(pts_dst), cv2.RANSAC, 4)
 
             # Apply a horizontal panorama
             trainImg = img_rgb[0]
