@@ -403,15 +403,21 @@ class LineExtractor ( Common ):
 
             curr_image.save_img_as_file(img_path, "sift_match.jpg", img=img3 )
 
-            h, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst), cv2.RANSAC, 4)
+            H, status = cv2.findHomography(np.array(pts_src), np.array(pts_dst), cv2.RANSAC, 4)
 
-            img4 = cv2.warpPerspective(img_rgb[0], h, (img_rgb[1].shape[1], img_rgb[1].shape[0]) )
+            # Apply a horizontal panorama
+            trainImg = img_rgb[0]
+            queryImg = img_rgb[1]
+            width = trainImg.shape[1] + queryImg.shape[1]
+            height = max( trainImg.shape[0], queryImg.shape[0] )
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy_a.jpg", img=img4)
+            result_01 = cv2.warpPerspective( trainImg, H, (width, height) )
+            result_02 = cv2.warpPerspective( queryImg, H, (width, height) )
 
-            img5 = cv2.warpPerspective(img_rgb[1], h, (img_rgb[1].shape[1], img_rgb[1].shape[0]) )
+            result_01[ 0 : result_02.shape[0] , result_02.shape[1]//2 : width ] = result_02[ 0 : result_02.shape[0] , 0 : result_02.shape[1]//2 ]
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy_b.jpg", img=img5)
+            curr_image.save_img_as_file(img_path, "sift_homograpy.jpg", img=result_01)
+
         pass
 
         lineList.mode = mode
