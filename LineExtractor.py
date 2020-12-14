@@ -469,15 +469,16 @@ if __name__ == '__main__':
 
     lineListMatched = LineList()
 
-    len_files = len( files )
-    for i in range( 0 , len_files, 2 ) :
+    files_len = len(files)
+
+    for i in range(0 , files_len, 2) :
         file = files[i]
 
         img_path = file.replace( "\\", "/" )
 
         log.info( "" )
         log.info( "*"*80 )
-        log.info( f"[{i:04d}] [{100*i/len_files:.1f} %] {img_path}" )
+        log.info( f"[{i:04d}] [{100 * i / files_len:.1f} %] {img_path}")
         log.info("*" * 80)
         log.info("")
 
