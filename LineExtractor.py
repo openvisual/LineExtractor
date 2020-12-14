@@ -414,18 +414,36 @@ class LineExtractor ( Common ):
             trainImg = img_rgb[0]
             queryImg = img_rgb[1]
             width = trainImg.shape[1] + queryImg.shape[1]
-            height = max( trainImg.shape[0], queryImg.shape[0] )
+            height = trainImg.shape[0] + queryImg.shape[0]
 
-            img4 = cv2.warpPerspective( trainImg, H, (width, height) )
+            result = cv2.warpPerspective( trainImg, H, (width, height) )
 
-            img4[0: img4.shape[0], img4.shape[1] // 2: width] = queryImg
+            result = result/2
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy", img=img4)
+            result[0:queryImg.shape[0], 0:queryImg.shape[1]] += queryImg/2
 
-            img5 = img4[0: img4.shape[0], 0 : img4.shape[1] // 2 ]
-            img5 = img5/2 + queryImg/2
+            curr_image.save_img_as_file(img_path, "sift_homograpy", img=result)
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy_overlap", img=img5)
+            # transform the panorama image to grayscale and threshold it
+            #result_gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+            result_gray = result
+            result_thresh = cv2.threshold(result_gray, 0, 255, cv2.THRESH_BINARY)[1]
+
+            import imutils
+            # Finds contours from the binary image
+            cnts = cv2.findContours(result_thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cnts = imutils.grab_contours(cnts)
+
+            # get the maximum contour area
+            c = max(cnts, key=cv2.contourArea)
+
+            # get a bbox from the contour area
+            (x, y, w, h) = cv2.boundingRect(c)
+
+            # crop the image to the bbox coordinates
+            result = result[y:y + h, x:x + w]
+
+            curr_image.save_img_as_file(img_path, "sift_homograpy_cut", img=result)
         pass
 
         lineList.mode = mode
