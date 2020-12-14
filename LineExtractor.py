@@ -425,13 +425,13 @@ class LineExtractor ( Common ):
             curr_image.save_img_as_file(img_path, "sift_homograpy", img=result)
 
             # transform the panorama image to grayscale and threshold it
-            #result_gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
-            result_gray = result
+            result = result.astype(np.uint8)
+            result_gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
             result_thresh = cv2.threshold(result_gray, 0, 255, cv2.THRESH_BINARY)[1]
 
             import imutils
             # Finds contours from the binary image
-            cnts = cv2.findContours(result_thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cnts = cv2.findContours(result_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             cnts = imutils.grab_contours(cnts)
 
             # get the maximum contour area
