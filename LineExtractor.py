@@ -355,7 +355,7 @@ class LineExtractor ( Common ):
 
             img_rgb = [ cv2.cvtColor( img[0], cv2.COLOR_GRAY2RGB), cv2.cvtColor( img[1], cv2.COLOR_GRAY2RGB) ]
 
-            for i, (m1, m2) in enumerate(matches):
+            for _, (m1, m2) in enumerate(matches):
                 valid = True
 
                 ratio = 0.7
