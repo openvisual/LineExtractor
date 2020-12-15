@@ -422,7 +422,7 @@ class LineExtractor ( Common ):
 
             result[0:queryImg.shape[0], 0:queryImg.shape[1]] += queryImg/2
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy", img=result)
+            curr_image.save_img_as_file(img_path, "sift_homography", img=result)
 
             # transform the panorama image to grayscale and threshold it
             result = result.astype(np.uint8)
@@ -443,7 +443,7 @@ class LineExtractor ( Common ):
             # crop the image to the bbox coordinates
             result = result[y:y + h, x:x + w]
 
-            curr_image.save_img_as_file(img_path, "sift_homograpy_cut", img=result)
+            curr_image.save_img_as_file(img_path, "sift_homography_cut", img=result)
         pass
 
         lineList.mode = mode
