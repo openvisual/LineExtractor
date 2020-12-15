@@ -31,8 +31,7 @@ class Stitcher:
 
         # check to see if the keypoint matches should be visualized
         if showMatches:
-            vis = self.drawMatches(imageA, imageB, kpsA, kpsB, matches,
-                                   status)
+            vis = self.drawMatches(imageA, imageB, kpsA, kpsB, matches, status)
 
             # return a tuple of the stitched image and the
             # visualization
@@ -103,6 +102,7 @@ class Stitcher:
         # initialize the output visualization image
         (hA, wA) = imageA.shape[:2]
         (hB, wB) = imageB.shape[:2]
+
         vis = np.zeros((max(hA, hB), wA + wB, 3), dtype="uint8")
         vis[0:hA, 0:wA] = imageA
         vis[0:hB, wA:] = imageB
@@ -116,6 +116,8 @@ class Stitcher:
                 ptA = (int(kpsA[queryIdx][0]), int(kpsA[queryIdx][1]))
                 ptB = (int(kpsB[trainIdx][0]) + wA, int(kpsB[trainIdx][1]))
                 cv2.line(vis, ptA, ptB, (0, 255, 0), 1)
+            pass
+        pass
 
         # return the visualization
         return vis
