@@ -414,11 +414,13 @@ class LineExtractor ( Common ):
             trainImg = img_rgb[0]
             queryImg = img_rgb[1]
             width = trainImg.shape[1] + queryImg.shape[1]
-            height = trainImg.shape[0] + queryImg.shape[0]
+            height = trainImg.shape[0]
 
             result = cv2.warpPerspective( trainImg, H, (width, height) )
 
             result = result/2
+
+            #result[0:imageB.shape[0], 0:imageB.shape[1]] = imageB
 
             result[0:queryImg.shape[0], 0:queryImg.shape[1]] += queryImg/2
 

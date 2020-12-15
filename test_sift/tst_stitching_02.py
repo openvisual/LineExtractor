@@ -18,14 +18,16 @@ class Stitcher:
 
         # match features between the two images
         m = self.matchKeypoints(kpsA, kpsB, featuresA, featuresB, ratio, reprojThresh)
-        if not m:
-            return None
+        if not m : return None
 
         # otherwise, apply a perspective warp to stitch the images
         # together
         (matches, H, status) = m
         result = cv2.warpPerspective(imageA, H, (imageA.shape[1] + imageB.shape[1], imageA.shape[0]))
-        result[0:imageB.shape[0], 0:imageB.shape[1]] = imageB
+
+        result = result / 2
+
+        result[0:imageB.shape[0], 0:imageB.shape[1]] += imageB/2
 
         # check to see if the keypoint matches should be visualized
         if showMatches:
@@ -118,6 +120,29 @@ class Stitcher:
         # return the visualization
         return vis
     pass
+
+    def boundary_cut(self, result):
+        # transform the panorama image to grayscale and threshold it
+        result = result.astype(np.uint8)
+        result_gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+        result_thresh = cv2.threshold(result_gray, 0, 255, cv2.THRESH_BINARY)[1]
+
+        import imutils
+        # Finds contours from the binary image
+        cnts = cv2.findContours(result_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = imutils.grab_contours(cnts)
+
+        # get the maximum contour area
+        c = max(cnts, key=cv2.contourArea)
+
+        # get a bbox from the contour area
+        (x, y, w, h) = cv2.boundingRect(c)
+
+        # crop the image to the bbox coordinates
+        result = result[y:y + h, x:x + w]
+
+        return result
+    pass
 pass
 
 if __name__ == '__main__':
@@ -125,15 +150,25 @@ if __name__ == '__main__':
     print( "Hello ..." )
 
     import os
-    os.system('cp ../data_sift/*.jpg c:/temp')
 
-    image1 = cv2.imread('../data_sift/a.jpg')
-    image2 = cv2.imread('../data_sift/b.jpg')
+    img_path = "../data_yegan/set_01/_1018843.JPG"
+
+    os.system( f'cp {img_path} c:/temp')
+    image1 = cv2.imread( img_path )
+
+    img_path = "../data_yegan/set_01/_1018844.JPG"
+
+    os.system(f'cp {img_path} c:/temp')
+    image2 = cv2.imread(img_path)
 
     stitcher = Stitcher()
     (result, vis) = stitcher.stitch([image1, image2], showMatches=True)
 
     cv2.imwrite( 'c:/temp/tmp_stitch_result.jpg', result )
+
+    result = stitcher.boundary_cut( result )
+
+    cv2.imwrite('c:/temp/tmp_stitch_boundary.jpg', result)
 
     print( "Good bye!")
 
