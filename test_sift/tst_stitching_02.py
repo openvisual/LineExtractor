@@ -9,7 +9,6 @@ class Stitcher:
 
     def __init__(self):
         self.isv3 = imutils.is_cv3()
-
     pass
 
     def stitch(self, images, ratio=0.75, reprojThresh=4.0, showMatches=False):
@@ -127,10 +126,7 @@ class Stitcher:
 
         # return the visualization
         return vis
-
     pass
-
-
 pass
 
 if __name__ == '__main__':
