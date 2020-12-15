@@ -8,7 +8,7 @@ import numpy as np
 class Stitcher:
 
     def __init__(self):
-        self.isv3 = imutils.is_cv3()
+        pass
     pass
 
     def stitch(self, images, ratio=0.75, reprojThresh=4.0, showMatches=False):
@@ -46,22 +46,13 @@ class Stitcher:
         # convert the image to grayscale
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        # check to see if we are using OpenCV 3.X
-        if self.isv3:
-            # detect and extract features from the image
-            descriptor = cv2.xfeatures2d.SIFT_create()
-            (kps, features) = descriptor.detectAndCompute(image, None)
+        # detect keypoints in the image
+        detector = cv2.SIFT_create()
+        kps = detector.detect(gray)
 
-        # otherwise, we are using OpenCV 2.4.X
-        else:
-            # detect keypoints in the image
-            detector = cv2.SIFT_create()
-            kps = detector.detect(gray)
-
-            # extract features from the image
-            extractor = cv2.SIFT_create()
-            (kps, features) = extractor.compute(gray, kps)
-        pass
+        # extract features from the image
+        extractor = cv2.SIFT_create()
+        (kps, features) = extractor.compute(gray, kps)
 
         # convert the keypoints from KeyPoint objects to NumPy
         # arrays
@@ -133,13 +124,16 @@ if __name__ == '__main__':
 
     print( "Hello ..." )
 
+    import os
+    os.system('cp ../data_sift/*.jpg c:/temp')
+
     image1 = cv2.imread('../data_sift/a.jpg')
     image2 = cv2.imread('../data_sift/b.jpg')
 
     stitcher = Stitcher()
     (result, vis) = stitcher.stitch([image1, image2], showMatches=True)
 
-    cv2.imwrite( 'tmp_stitch_result.jpg', result )
+    cv2.imwrite( 'c:/temp/tmp_stitch_result.jpg', result )
 
     print( "Good bye!")
 
