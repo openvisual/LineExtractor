@@ -113,6 +113,24 @@ class Image (Common) :
         return fileName
     pass  # -- save_img_as_file
 
+    def is_gray( self, img=None ):
+        if img is None :
+            img = self.img
+        pass
+
+        if len(img.shape) < 3 or img.shape[2] == 1:
+            return True
+        pass
+
+        b, g, r = img[:, :, 0], img[:, :, 1], img[:, :, 2]
+
+        if (b == g).all() and (b == r).all():
+            return True
+        pass
+
+        return False
+    pass
+
     ''' -- 이미지 저장 함수 '''
 
     # pyplot ax 의 프레임 경계 색상 변경

@@ -406,9 +406,9 @@ class LineExtractor ( Common ):
 
             draw_params = dict(matchColor=(255, 0, 0), singlePointColor=(0, 0, 255), matchesMask=matchesMask, flags=0)
 
-            img3 = cv2.drawMatchesKnn( img[0], kp[0], img[1], kp[1], goods, None, **draw_params)
+            img_sift_match = cv2.drawMatchesKnn( img[0], kp[0], img[1], kp[1], goods, None, **draw_params)
 
-            curr_image.save_img_as_file(img_path, "sift_match", img=img3 )
+            curr_image.save_img_as_file(img_path, "sift_match", img=img_sift_match )
 
             pts_src = np.float32(pts_src).reshape(-1, 1, 2)
             pts_dst = np.float32(pts_dst).reshape(-1, 1, 2)
@@ -416,24 +416,41 @@ class LineExtractor ( Common ):
             H, h_mask = cv2.findHomography( pts_src, pts_dst, cv2.RANSAC, 5)
 
             # Apply a horizontal panorama
-            trainImg = img_rgb[0]
-            queryImg = img_rgb[1]
-            width = trainImg.shape[1] + queryImg.shape[1]
-            height = trainImg.shape[0]
 
-            result = cv2.warpPerspective( trainImg, H, (width, height) )
+            show_key_points = False
 
-            result = result/2
+            img_a = img[0]
+            img_b = img[1]
 
-            #result[0:imageB.shape[0], 0:imageB.shape[1]] = imageB
+            if show_key_points :
+                img_a = img_rgb[0]
+                img_b = img_rgb[1]
+            pass
 
-            result[0:queryImg.shape[0], 0:queryImg.shape[1]] += queryImg/2
+            img_width  = img_a.shape[1] + img_b.shape[1]
+            img_height = img_a.shape[0]
+
+            result = cv2.warpPerspective( img_a, H, ( img_width, img_height) )
+
+            overlap = True
+            if overlap :
+                result = result / 2
+
+                result[0:img_b.shape[0], 0:img_b.shape[1]] += img_b / 2
+            else :
+                result[0:img_b.shape[0], 0:img_b.shape[1]] = img_b
+            pass
 
             curr_image.save_img_as_file(img_path, "sift_homography", img=result)
 
             # transform the panorama image to grayscale and threshold it
-            result = result.astype(np.uint8)
-            result_gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+            result = result.astype( np.uint8 )
+            result_gray = np.array( result )
+
+            if not curr_image.is_gray( result ) :
+                result_gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+            pass
+
             result_thresh = cv2.threshold(result_gray, 0, 255, cv2.THRESH_BINARY)[1]
 
             import imutils
@@ -469,6 +486,8 @@ if __name__ == '__main__':
     files = []
 
     #img_path = "./data_yegan/set_01"
+    # img_path = "./data_yegan/grp_01/01"
+
     img_path = "./data_yegan/set_06/data4.JPG"
     img_path = "./data_yegan/set_06/DJI_0146.JPG"
     img_path = "./data_yegan/set_06/IMG_0129.JPG"
@@ -483,8 +502,9 @@ if __name__ == '__main__':
     img_path = "./data_yegan/set_01/_1018844.JPG"
 
     img_path = "./data_yegan/set_01/_1018859.JPG"
+    img_path = "./data_yegan/set_01/_1018859.JPG"
 
-    #img_path = "./data_yegan/grp_01/01"
+    img_path = "./data_yegan/set_08/DJI_0177.JPG"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)
