@@ -473,6 +473,7 @@ if __name__ == '__main__':
 
     img_path = "./data_yegan/set_04/P1010015.JPG"
     img_path = "./data_yegan/set_01/_1018843.JPG"
+    img_path = "./data_yegan/set_07/01.JPG"
     #img_path = "./data_yegan/grp_01/01"
 
     if not os.path.isdir( img_path ) :
