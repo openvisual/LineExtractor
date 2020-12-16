@@ -358,40 +358,45 @@ class LineExtractor ( Common ):
             for _, (m1, m2) in enumerate(matches):
                 valid = True
 
-                ratio = 0.7
+                ratio = 0.75
                 # ratio = 0.9
+
+                pts = [kp[0][m1.queryIdx].pt, kp[1][m1.trainIdx].pt]
 
                 if valid and (m1.distance > ratio * m2.distance):
                     valid = False
                 pass
 
                 if valid:
-                    pts = [ kp[0][m1.queryIdx].pt, kp[1][m1.trainIdx].pt ]
-
                     #log.info( f"m1.queryIdx = {m1.queryIdx}, m1.trainIdx = {m1.trainIdx}")
 
-                    dx = pts[0][0] - pts[1][0]
-                    dy = pts[0][1] - pts[1][1]
+                    checkDimension = False
 
-                    if dx * dx + dy * dy > dim_square:
-                        valid = False
-                    pass
+                    if checkDimension :
+                        dx = pts[0][0] - pts[1][0]
+                        dy = pts[0][1] - pts[1][1]
 
-                    if valid:
-                        pts_src.append(pts[0])
-                        pts_dst.append(pts[1])
-
-                        goods.append([m1, m2])
-                        matchesMask.append([1, 0])
-
-                        print(i, pts[0], pts[1])
-
-                        if True :
-                            # Draw pairs in purple, to make sure the result is ok
-                            cv2.circle(img_rgb[0], (int(pts[0][0]), int(pts[0][1])), 20, (255, 255, 0), 4)
-                            cv2.circle(img_rgb[1], (int(pts[1][0]), int(pts[1][1])), 20, (0, 255, 255), 4)
+                        if dx * dx + dy * dy > dim_square:
+                            valid = False
                         pass
                     pass
+                pass
+
+                if valid:
+                    pts_src.append(pts[0])
+                    pts_dst.append(pts[1])
+
+                    goods.append([m1, m2])
+                    matchesMask.append([1, 0])
+
+                    print(i, pts[0], pts[1])
+
+                    if True :
+                        # Draw pairs in purple, to make sure the result is ok
+                        cv2.circle(img_rgb[0], (int(pts[0][0]), int(pts[0][1])), 20, (255, 255, 0), 4)
+                        cv2.circle(img_rgb[1], (int(pts[1][0]), int(pts[1][1])), 20, (0, 255, 255), 4)
+                    pass
+                pass
 
                 pass
             pass # -- for
@@ -472,8 +477,13 @@ if __name__ == '__main__':
     img_path = "./data_yegan/set_04"
 
     img_path = "./data_yegan/set_04/P1010015.JPG"
-    img_path = "./data_yegan/set_01/_1018843.JPG"
     img_path = "./data_yegan/set_07/01.JPG"
+
+    img_path = "./data_yegan/set_01/_1018843.JPG"
+    img_path = "./data_yegan/set_01/_1018844.JPG"
+
+    img_path = "./data_yegan/set_01/_1018859.JPG"
+
     #img_path = "./data_yegan/grp_01/01"
 
     if not os.path.isdir( img_path ) :
