@@ -519,7 +519,7 @@ if __name__ == '__main__':
 
     files_len = len(files)
 
-    for i in range(0 , files_len, 2) :
+    for i in range(0, files_len, 2) :
         file = files[i]
 
         img_path = file.replace( "\\", "/" )
