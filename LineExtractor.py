@@ -485,9 +485,6 @@ if __name__ == '__main__':
 
     files = []
 
-    #img_path = "./data_yegan/set_01"
-    # img_path = "./data_yegan/grp_01/01"
-
     img_path = "./data_yegan/set_06/data4.JPG"
     img_path = "./data_yegan/set_06/DJI_0146.JPG"
     img_path = "./data_yegan/set_06/IMG_0129.JPG"
