@@ -742,7 +742,7 @@ class Image (Common) :
                 is_line = False
             else:
                 if ( arc_perimeter - line_length )/arc_perimeter < 0.03 :
-                    # 아크 길이와 직선 길이의 비율이 2% 미만이면, 직선으로 판변한다.
+                    # 아크 길이와 직선 길이의 비율이 2% 미만이면, 직선으로 판별한다.
                     is_line = True
                 else :
                     is_line = False
