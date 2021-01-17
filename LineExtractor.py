@@ -89,7 +89,7 @@ class LineExtractor ( Common ):
         channel_cnt = img_org.shape[2]
 
         margin_ratio = 5
-        margin_ratio = 0
+        #margin_ratio = 0
 
         self.width  = width
         self.height = height
@@ -315,7 +315,8 @@ class LineExtractor ( Common ):
             lineList.lineListIdentified = lineListIdentified
         pass
 
-        if grayscale_prev is not None :
+        use_sift = False
+        if use_sift and grayscale_prev is not None :
             # Initiate SIFT detector
             sift = cv2.SIFT_create()
 
@@ -501,6 +502,10 @@ if __name__ == '__main__':
     img_path = "./data_yegan/set_01/_1018859.JPG"
 
     img_path = "./data_yegan/set_08/DJI_0177.JPG"
+
+    img_path = "./data_test/01"
+    img_path = "./data_test/02"
+    img_path = "./data_test/03"
 
     if not os.path.isdir( img_path ) :
         files.append(img_path)
