@@ -263,6 +263,7 @@ class LineExtractor ( Common ):
             contours_image.save_img_as_file(img_path, contours_image.algorithm)
 
             contour_filtering = False
+
             if contour_filtering :
                 contours_filtered = contours_image.filter_contours(contours)
                 contours_image = contours_image.draw_contours(contours_filtered, lineWidth=lineWidth)
@@ -271,9 +272,12 @@ class LineExtractor ( Common ):
                 contours_filtered = contours
             pass
 
-            lines_only = contours_image.filter_lines_only( contours_filtered )
-            contours_image = contours_image.draw_polylines(lines_only, lineWidth=lineWidth)
-            contours_image.save_img_as_file(img_path, contours_image.algorithm + "_lines_only")
+            extract_line_only = False
+            if extract_line_only :
+                lines_only = contours_image.filter_lines_only( contours_filtered )
+                contours_image = contours_image.draw_polylines(lines_only, lineWidth=lineWidth)
+                contours_image.save_img_as_file(img_path, contours_image.algorithm + "_lines_only")
+            pass
 
             curr_image = contours_image
 
